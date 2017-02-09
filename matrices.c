@@ -3,7 +3,7 @@
 #include <stdlib.h>
 using namespace std;
 
-#define N 3
+#define N 1000
 
 void print(vector<vector<int>> &c){
   for (int i = 0; i < c.size(); i++) {
@@ -22,10 +22,6 @@ void randNumbers(vector<vector<int> > &v) {
   }
 }
 
-void name(/* arguments */) {
-  /* code */
-}
-
 void matrixMult(vector<vector<int>> &a, vector<vector<int>> &b, vector<vector<int>> &c){
   for (int i = 0; i<a.size(); i++){
     for (int j = 0; j<b.size(); j++){
@@ -41,9 +37,9 @@ int main(int argc, char const *argv[]) {
   vector<vector<int> > b(N,vector<int>(N,3));
   vector<vector<int> > c(N,vector<int>(N,0));
 
-  //randNumbers(a);
-  //randNumbers(b);
+  randNumbers(a);
+  randNumbers(b);
   matrixMult( a, b, c);
-  print(c);
+  //print(c);
   return 0;
 }
