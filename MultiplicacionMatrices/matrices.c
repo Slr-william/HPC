@@ -1,7 +1,6 @@
 #include<iostream>
 #include<vector>
 #include <stdlib.h>
-#include <omp.h>
 using namespace std;
 
 #define N 1000
@@ -40,10 +39,11 @@ int main(int argc, char const *argv[]) {
 
   randNumbers(a);
   randNumbers(b);
-  double begin = omp_get_wtime();
+  clock_t begin = clock();
   matrixMult( a, b, c);
-  double end = omp_get_wtime();
-  cout<<"Tiempo : "<<end - begin<<endl;
+  clock_t end = clock();
+  double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  cout<<"Time : "<<time_spent<<endl;
   //print(c);
   return 0;
 }

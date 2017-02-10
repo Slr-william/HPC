@@ -66,7 +66,7 @@ int main(int argc, char const *argv[]) {
   double begin = omp_get_wtime();
   matrixMult( a, b, c);
   double end = omp_get_wtime();
-  cout<<"Tiempo : "<<end - begin<<endl;
+  cout<<"Time : "<<end - begin<<endl;
   //print(c);
   return 0;
 }
