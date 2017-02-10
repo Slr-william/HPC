@@ -28,11 +28,10 @@ void randNumbers(vector<vector<int> > &v) {
 void matrixMult(vector<vector<int>> &a, vector<vector<int>> &b, vector<vector<int>> &c){
   int i,j,k;
   int nthreads, tid,chunk;
-  #pragma omp parallel shared(nthreads,chunk) private(i,j,k,tid)
-  {
+
+  #pragma omp parallel shared(nthreads,chunk) private(i,j,k,tid){
     tid = omp_get_thread_num();
     if (tid == 0){nthreads = omp_get_num_threads();}
-
     chunk = CHUNKSIZE;
 
     #pragma omp for schedule(dynamic,chunk)
