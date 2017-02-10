@@ -18,10 +18,20 @@ void print(vector<vector<int>> &c){
 }
 
 void randNumbers(vector<vector<int> > &v) {
+  int i,j;
+  int nthreads, tid,chunk;
+  chunk = CHUNKSIZE;
+  #pragma omp parallel shared(nthreads,chunk) private(i,j,tid)
+  {
+    tid = omp_get_thread_num();
+    if (tid == 0){nthreads = omp_get_num_threads();}
+
+  #pragma omp for schedule(dynamic,chunk)
   for (int i = 0; i < v.size(); i++) {
     for (int j = 0; j < v.size(); j++) {
       v[i][j] = rand() % 10 + 1;
     }
+  }
   }
 }
 
@@ -32,12 +42,7 @@ void matrixMult(vector<vector<int>> &a, vector<vector<int>> &b, vector<vector<in
   #pragma omp parallel shared(nthreads,chunk) private(i,j,k,tid)
   {
     tid = omp_get_thread_num();
-    if (tid == 0)
-      {
-      nthreads = omp_get_num_threads();
-      //printf("Number of threads = %d\n", nthreads);
-      }
-    //printf("Thread %d starting...\n",tid);
+    if (tid == 0){nthreads = omp_get_num_threads();}
 
     #pragma omp for schedule(dynamic,chunk)
     for ( i = 0; i<a.size(); i++){
@@ -58,7 +63,10 @@ int main(int argc, char const *argv[]) {
 
   randNumbers(a);
   randNumbers(b);
+  double begin = omp_get_wtime();
   matrixMult( a, b, c);
+  double end = omp_get_wtime();
+  cout<<"Tiempo : "<<end - begin<<endl;
   //print(c);
   return 0;
 }
