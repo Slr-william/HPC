@@ -5,7 +5,7 @@
 #include <stdlib.h>
 using namespace std;
 
-#define CHUNKSIZE   100
+#define CHUNKSIZE 100
 #define N 1000
 
 void print(vector<vector<int>> &c){
@@ -18,36 +18,27 @@ void print(vector<vector<int>> &c){
 }
 
 void randNumbers(vector<vector<int> > &v) {
-  int i,j;
-  int nthreads, tid,chunk;
-  chunk = CHUNKSIZE;
-  #pragma omp parallel shared(nthreads,chunk) private(i,j,tid)
-  {
-    tid = omp_get_thread_num();
-    if (tid == 0){nthreads = omp_get_num_threads();}
-
-  #pragma omp for schedule(dynamic,chunk)
   for (int i = 0; i < v.size(); i++) {
     for (int j = 0; j < v.size(); j++) {
       v[i][j] = rand() % 10 + 1;
     }
-  }
   }
 }
 
 void matrixMult(vector<vector<int>> &a, vector<vector<int>> &b, vector<vector<int>> &c){
   int i,j,k;
   int nthreads, tid,chunk;
-  chunk = CHUNKSIZE;
   #pragma omp parallel shared(nthreads,chunk) private(i,j,k,tid)
   {
     tid = omp_get_thread_num();
     if (tid == 0){nthreads = omp_get_num_threads();}
 
+    chunk = CHUNKSIZE;
+
     #pragma omp for schedule(dynamic,chunk)
     for ( i = 0; i<a.size(); i++){
       for ( j = 0; j<b.size(); j++){
-          for ( k = 0; k<N; k++){
+          for ( k = 0; k<b.size(); k++){
             c[i][j] += a[i][k] * b[k][j];
            }
         }
