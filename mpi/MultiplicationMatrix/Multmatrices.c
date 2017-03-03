@@ -69,7 +69,7 @@ numworkers = numproc-1;
       MPI_Recv(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
       MPI_Recv(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD, &status);
       MPI_Recv(&A, rows*NC, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD, &status);
-      MPI_Recv(&B, NC*NCB, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD, &status);
+      MPI_Recv(&B, NC*NR, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD, &status);
 
       for (k=0; k<NC; k++)
          for (i=0; i<rows; i++)
@@ -81,7 +81,7 @@ numworkers = numproc-1;
       mtype = FROM_WORKER;
       MPI_Send(&offset, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
       MPI_Send(&rows, 1, MPI_INT, MASTER, mtype, MPI_COMM_WORLD);
-      MPI_Send(&C, rows*NCB, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD);
+      MPI_Send(&C, rows*NC, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD);
    }
    MPI_Finalize();
 }
