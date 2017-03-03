@@ -40,8 +40,8 @@ numworkers = numtasks-1;
       printf("mpi_mm has started with %d tasks.\n",numtasks);
       printf("Initializing arrays...\n");
       for (i=0; i<N; i++){
-        a[i]= 1;
-				b[i]= 1;
+        a[i]= 2;
+				b[i]= 2;
 			}
 
       /* Send matrix data to the worker tasks */
@@ -76,7 +76,10 @@ numworkers = numtasks-1;
       printf("Result Matrix:\n");
       for (i=0; i<N; i++)
       {
-            printf("%d ", c[i]);
+            printf("%f ", c[i]);
+						if (i%9 == 0) {
+						printf("\n");
+						}
       }
       printf("\n******************************************************\n");
       printf ("Done.\n");
@@ -92,7 +95,7 @@ numworkers = numtasks-1;
       MPI_Recv(&a, rows, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD, &status);
       MPI_Recv(&b, rows, MPI_DOUBLE, MASTER, mtype, MPI_COMM_WORLD, &status);
 
-      for (k=0; k<NCB; k++){
+      for (k=0; k<rows; k++){
 				c[k] = a[k] + b[k];
 			}
       mtype = FROM_WORKER;
