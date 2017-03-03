@@ -58,7 +58,7 @@ numworkers = numproc-1;
       for (i=0; i<NR; i++)
       {
          printf("\n");
-         for (j=0; j<NCB; j++)
+         for (j=0; j<NC; j++)
             printf("%6.2f   ", C[i][j]);
       }
    }
