@@ -51,7 +51,7 @@ numworkers = numproc-1;
          source = i;
          MPI_Recv(&offset, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
          MPI_Recv(&rows, 1, MPI_INT, source, mtype, MPI_COMM_WORLD, &status);
-         MPI_Recv(&c[offset][0], rows*NCB, MPI_DOUBLE, source, mtype,
+         MPI_Recv(&C[offset][0], rows*NCB, MPI_DOUBLE, source, mtype,
                   MPI_COMM_WORLD, &status);
       }
 
