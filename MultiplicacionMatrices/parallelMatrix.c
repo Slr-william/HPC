@@ -5,8 +5,8 @@
 #include <stdlib.h>
 using namespace std;
 
-#define CHUNKSIZE 100
-#define N 1000
+#define CHUNKSIZE 20
+#define N 2000
 
 void print(vector<vector<int>> &c){
   for (int i = 0; i < c.size(); i++) {
@@ -35,7 +35,7 @@ void matrixMult(vector<vector<int>> &a, vector<vector<int>> &b, vector<vector<in
 
     chunk = CHUNKSIZE;
 
-    #pragma omp for schedule(dynamic,chunk)
+    #pragma omp for schedule(static,chunk)
     for ( i = 0; i<a.size(); i++){
       for ( j = 0; j<b.size(); j++){
           for ( k = 0; k<b.size(); k++){
@@ -48,16 +48,17 @@ void matrixMult(vector<vector<int>> &a, vector<vector<int>> &b, vector<vector<in
 
 int main(int argc, char const *argv[]) {
 
-  vector<vector<int> > a(N,vector<int>(N,2));
-  vector<vector<int> > b(N,vector<int>(N,3));
+  vector<vector<int> > a(N,vector<int>(N,1));
+  vector<vector<int> > b(N,vector<int>(N,1));
   vector<vector<int> > c(N,vector<int>(N,0));
-
+  double begin, end;
   randNumbers(a);
   randNumbers(b);
-  double begin = omp_get_wtime();
+  begin = omp_get_wtime();
   matrixMult( a, b, c);
-  double end = omp_get_wtime();
+  end = omp_get_wtime();
   cout<<"Time : "<<end - begin<<endl;
+  cout<<"Begin: "<<begin<<" End : "<<end<<endl;
   //print(c);
   return 0;
 }

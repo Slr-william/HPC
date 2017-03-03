@@ -3,7 +3,7 @@
 #include <stdlib.h>
 using namespace std;
 
-#define N 1000
+#define N 2000
 
 void print(vector<vector<int>> &c){
   for (int i = 0; i < c.size(); i++) {
