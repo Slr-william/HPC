@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define NR 10
-#define NC 10
+#define NR 3
+#define NC 3
 #define MASTER 0
 #define FROM_MASTER 1
 #define FROM_WORKER 2
