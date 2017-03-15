@@ -18,17 +18,24 @@ __global__ void PictureKernell(float * d_Pin, float * d_Pout, int n, int m ){
 	}
 }
 
-__global__ void MatrixMulKernel(float *d_M, float *d_N, float *d_P,int width){
-	int Row = blockIdx.y*blockDim.y + threadIdx.y;
-	int Col = blockIdx.x*blockDim.x + threadIdx.x;
-	
-	if ((Row < width)&&(Col < width)){
-		float Pvalue = 0;
-		for (int i = 0; i < width; ++i){
-			Pvalue += d_M[Row*width+i]*d_N[i*width+Col];
-		}
-		d_P[Row*width + Col] = Pvalue;
-	}
+
+void makeImage(unsigned char *h_img, unsigned char *result_img, int width, int height) {
+  int size = width * height * sizeof(unsigned char);
+  unsigned char *d_img, *d_out_img;
+  
+  cudaMalloc((void**) &d_img, size);
+  cudaMalloc((void**) &d_out_img, size);
+  cudaMemcpy(d_img, h_img, size, cudaMemcpyHostToDevice);
+  
+  int block_size = 32;
+  dim3 dim_grid(ceil((double) width / block_size), ceil((double) height / block_size), 1);
+  dim3 dim_block(block_size, block_size, 1);
+  PictureKernell<<<dim_grid, dim_block>>>(d_img, d_out_img, width, height);
+  cudaMemcpy(result_img, d_out_img, size, cudaMemcpyDeviceToHost);
+  cudaDeviceSynchronize();
+  
+  cudaFree(d_img);
+  cudaFree(d_out_img);
 }
 
 int main(int argc, char *argv[]){
@@ -39,9 +46,19 @@ int main(int argc, char *argv[]){
 		name = string(argv[1]);
 	}
 
-	Mat image = imread(, CV_LOAD_IMAGE_COLOR);
+	Mat image = imread(name, CV_LOAD_IMAGE_GRAYSCALE);
+	int height = image.rows;
+	int width = image.cols;
+	int size = width * height * sizeof(unsigned char);
+  
+	unsigned char *result_img = (unsigned char*) malloc(size);
+	unsigned char *org_img = (unsigned char*) image.data;
+
+	makeImage(org_img,result_img,width,height);
+
 	namedWindow( "Display window", WINDOW_AUTOSIZE ); // Create a window for display.
-    imshow( "Display window", image );                // Show our image inside it.	
+    imshow( "Display window", result_img);                // Show our image inside it.	
+    free(result_img);
 	return 0;
 	
 }
