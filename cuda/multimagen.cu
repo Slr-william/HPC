@@ -1,7 +1,8 @@
-#include<iostream>
+#include <iostream>
 #include <string>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp> // import no include errors 
 #include <cuda.h>
 
 using namespace std;
