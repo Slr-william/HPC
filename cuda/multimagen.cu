@@ -58,7 +58,8 @@ int main(int argc, char *argv[]){
 	Mat image_output(height, width, CV_8UC1, (void*) result_img);
 
 	namedWindow( "Display window", WINDOW_AUTOSIZE ); // Create a window for display.
-    imshow( "Display window", image_output);                // Show our image inside it.	
+    imshow( "Display window", image_output);                // Show our image inside it.
+    waitKey(0);	
     free(result_img);
 	return 0;
 	
