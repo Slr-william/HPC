@@ -55,9 +55,10 @@ int main(int argc, char *argv[]){
 	unsigned char *org_img = (unsigned char*) image.data;
 
 	makeImage(org_img,result_img,width,height);
+	Mat image_output(height, width, CV_8UC1, (void*) result_img);
 
 	namedWindow( "Display window", WINDOW_AUTOSIZE ); // Create a window for display.
-    imshow( "Display window", result_img);                // Show our image inside it.	
+    imshow( "Display window", image_output);                // Show our image inside it.	
     free(result_img);
 	return 0;
 	
