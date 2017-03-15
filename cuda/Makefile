@@ -1,9 +1,6 @@
-all: program
+CUDAC = nvcc
+CFLAGS = `pkg-config --cflags opencv`
+LIBS = `pkg-config --libs opencv`
 
-program: cudacode.o
-	g++ -o program -L/usr/local/cuda/lib64 -lcuda -lcudart multimagen.cpp  cudacode.o 
-
-cudacode.o:
-	nvcc -c -arch=sm_20 multimagen.cu 
-
-clean: rm -rf *o program
+multimagen: multimagen.cu
+	$(CUDAC) $(CFLAGS) multimagen.cu $(LIBS) -o multimagen.out
