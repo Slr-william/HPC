@@ -21,21 +21,20 @@ __global__ void PictureKernell(unsigned char * d_Pin, unsigned char * d_Pout, in
 
 void makeImage(unsigned char *h_img, unsigned char *result_img, int width, int height) {
   int size = width * height * sizeof(unsigned char);
-  unsigned char *d_img, *d_out_img;
+  unsigned char *d_img, *d_result_img;
   
   cudaMalloc((void**) &d_img, size);
-  cudaMalloc((void**) &d_out_img, size);
+  cudaMalloc((void**) &d_result_img, size);
   cudaMemcpy(d_img, h_img, size, cudaMemcpyHostToDevice);
   
   int block_size = 32;
   dim3 dim_grid(ceil((double) width / block_size), ceil((double) height / block_size), 1);
   dim3 dim_block(block_size, block_size, 1);
-  PictureKernell<<<dim_grid, dim_block>>>(d_img, d_out_img, width, height);
-  cudaMemcpy(result_img, d_out_img, size, cudaMemcpyDeviceToHost);
-  cudaDeviceSynchronize();
+  PictureKernell<<<dim_grid, dim_block>>>(d_img, d_result_img, width, height);
+  cudaMemcpy(result_img, d_result_img, size, cudaMemcpyDeviceToHost);
   
   cudaFree(d_img);
-  cudaFree(d_out_img);
+  cudaFree(d_result_img);
 }
 
 int main(int argc, char *argv[]){
@@ -55,10 +54,10 @@ int main(int argc, char *argv[]){
 	unsigned char *org_img = (unsigned char*) image.data;
 
 	makeImage(org_img,result_img,width,height);
-	Mat image_output(height, width, CV_8UC1, (void*) result_img);
+	Mat final_image(height, width, CV_8UC1, (void*) result_img);
 
-	namedWindow( "Display window", WINDOW_AUTOSIZE ); // Create a window for display.
-    imshow( "Display window", image_output);                // Show our image inside it.
+	namedWindow( "Display window", WINDOW_NORMAL ); // Create a window for display.
+    imshow( "Display window", final_image);                // Show our image inside it.
     waitKey(0);	
     free(result_img);
 	return 0;
