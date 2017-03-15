@@ -27,7 +27,7 @@ void makeImage(unsigned char *h_img, unsigned char *result_img, int width, int h
   cudaMalloc((void**) &d_result_img, size);
   cudaMemcpy(d_img, h_img, size, cudaMemcpyHostToDevice);
   
-  int block_size = 64;
+  int block_size = 32;
   dim3 dim_grid(ceil((double) width / block_size), ceil((double) height / block_size), 1);
   dim3 dim_block(block_size, block_size, 1);
   PictureKernell<<<dim_grid, dim_block>>>(d_img, d_result_img, width, height);
