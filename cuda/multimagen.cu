@@ -27,7 +27,7 @@ void makeImage(unsigned char *h_img, unsigned char *result_img, int width, int h
   cudaMalloc((void**) &d_result_img, size);
   cudaMemcpy(d_img, h_img, size, cudaMemcpyHostToDevice);
   
-  int block_size = 32;
+  int block_size = 64;
   dim3 dim_grid(ceil((double) width / block_size), ceil((double) height / block_size), 1);
   dim3 dim_block(block_size, block_size, 1);
   PictureKernell<<<dim_grid, dim_block>>>(d_img, d_result_img, width, height);
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]){
 	Mat final_image(height, width, CV_8UC1, (void*) result_img);
 
 	namedWindow( "Display window", WINDOW_NORMAL ); // Create a window for display.
-    imshow( "Display window", final_image);                // Show our image inside it.
+    imshow( "Display window", final_image);        // Show our image inside it.
     waitKey(0);	
     free(result_img);
 	return 0;
