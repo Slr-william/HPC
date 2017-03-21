@@ -73,17 +73,17 @@ int main(int argc, char *argv[]){
     cvtColor(image, gray_image_opencv, CV_BGR2GRAY);
     end = clock();
 
-	imwrite("./Gray_Image.jpg",gray_image);
+	  //imwrite("./Gray_Image.jpg",gray_image);
 
-    namedWindow(name, WINDOW_NORMAL);
-    namedWindow("Gray Image CUDA", WINDOW_NORMAL);
-    namedWindow("Gray Image OpenCV", WINDOW_NORMAL);
+    //namedWindow(name, WINDOW_NORMAL);
+    //namedWindow("Gray Image CUDA", WINDOW_NORMAL);
+    //namedWindow("Gray Image OpenCV", WINDOW_NORMAL);
 
-    imshow(name,image);
-    imshow("Gray Image CUDA", gray_image);
-    imshow("Gray Image OpenCV",gray_image_opencv);
+    //imshow(name,image);
+    //imshow("Gray Image CUDA", gray_image);
+    //imshow("Gray Image OpenCV",gray_image_opencv);
 
-    waitKey(0);
+    //waitKey(0);
 
     gpu_time_used = ((double) (endGPU - startGPU)) / CLOCKS_PER_SEC;
     printf("Tiempo Algoritmo Paralelo: %.10f\n",gpu_time_used);
