@@ -4,9 +4,14 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp> // import no include errors 
 #include <cuda.h>
+#include <stdio.h>
 
 using namespace cv;
 using namespace std;
+
+#define RED 2
+#define GREEN 1
+#define BLUE 0
 
 __global__ void PictureKernell(unsigned char *imageInput, int width, int height, unsigned char *imageOutput){
 	int row = blockIdx.y*blockDim.y+threadIdx.y;
@@ -28,7 +33,7 @@ int main(int argc, char *argv[]){
 	
 	cout<<"Name: "<<name<<endl;
 
-	Mat image = imread(name, CV_LOAD_IMAGE);
+	Mat image = imread(name, 1);
 	int height = image.rows;
 	int width = image.cols;
 	int size = width * height * sizeof(unsigned char)*image.channels();
@@ -70,11 +75,11 @@ int main(int argc, char *argv[]){
 
 	imwrite("./Gray_Image.jpg",gray_image);
 
-    namedWindow(imageName, WINDOW_NORMAL);
+    namedWindow(name, WINDOW_NORMAL);
     namedWindow("Gray Image CUDA", WINDOW_NORMAL);
     namedWindow("Gray Image OpenCV", WINDOW_NORMAL);
 
-    imshow(imageName,image);
+    imshow(name,image);
     imshow("Gray Image CUDA", gray_image);
     imshow("Gray Image OpenCV",gray_image_opencv);
 
