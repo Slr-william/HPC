@@ -19,8 +19,7 @@ __global__ void PictureKernell(unsigned char *imageInput, int width, int height,
     int col = blockIdx.x*blockDim.x+threadIdx.x;
 
     if((row < height) && (col < width)){
-        imageOutput[row*width+col] = imageInput[(row*width+col)*3+RED]*0.299 + imageInput[(row*width+col)*3+GREEN]*0.587 \ 
-        + imageInput[(row*width+col)*3+BLUE]*0.114;
+        imageOutput[row*width+col] = imageInput[(row*width+col)*3+RED]*0.299 + imageInput[(row*width+col)*3+GREEN]*0.587 + imageInput[(row*width+col)*3+BLUE]*0.114;
     }
 }
 
@@ -42,7 +41,8 @@ int main(int argc, char *argv[]){
 	clock_t start, end, startGPU, endGPU;
   double cpu_time_used, gpu_time_used;
   unsigned char *dataRawImage, *d_dataRawImage, *d_imageOutput, *h_imageOutput;
-
+	
+  string text  = name+"Times";
   for (int i = 0; i < 20; i++){
     
   	dataRawImage = (unsigned char*)malloc(size);
@@ -95,8 +95,8 @@ int main(int argc, char *argv[]){
     printf("Tiempo Algoritmo Paralelo: %.10f\n",gpu_time_used);
     printf("Tiempo Algoritmo OpenCV: %.10f\n",cpu_time_used);
     printf("La aceleración obtenida es de %.10fX\n",aceleration);
-
-    ofstream outfile("Times"+name,ios::binary | ios::app);
+	
+    ofstream outfile(text.c_str(),ios::binary | ios::app);
     outfile << gpu_time_used<<" "<< cpu_time_used <<" "<< aceleration << "\n";
     outfile.close();
 
