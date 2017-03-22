@@ -73,13 +73,14 @@ int main(int argc, char const *argv[])
     int blockSize = 32;
     dim3 dimBlock(blockSize,blockSize,1);
     dim3 dimGrid(ceil(width/float(blockSize)),ceil(width/float(blockSize)),1);
-    matrixMulKernel<<<dimGrid,dimBlock>>>(d_M,d_N,d_P,width);
+    MatrixMulKernel<<<dimGrid,dimBlock>>>(d_M,d_N,d_P,width);
     cudaDeviceSynchronize();
     cudaMemcpy(h_P_d,d_P,size,cudaMemcpyDeviceToHost);
     endGPU = clock();
+    aceleration = cpu_time_used/gpu_time_used;
     gpu_time_used = ((double) (endGPU - startGPU)) / CLOCKS_PER_SEC;
     printf("Tiempo algoritmo paralelo: %.10f\n", gpu_time_used);
-    printf("La aceleración obtenida es de %.10fX\n",cpu_time_used/gpu_time_used);
+    printf("La aceleración obtenida es de %.10fX\n",aceleration);
 
     free(h_M);
     free(h_N);
