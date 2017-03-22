@@ -88,7 +88,7 @@ int main(int argc, char const *argv[])
 
         std::string name =  "TimesMult.txt"+num;
 
-        ofstream outfile(name,ios::binary | ios::app);
+        std::ofstream outfile(name,ios::binary | ios::app);
         outfile << gpu_time_used<<" "<< cpu_time_used <<" "<< aceleration << "\n";
         outfile.close();
 
