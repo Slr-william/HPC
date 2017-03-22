@@ -42,64 +42,67 @@ int main(int argc, char *argv[]){
 	clock_t start, end, startGPU, endGPU;
   double cpu_time_used, gpu_time_used;
   unsigned char *dataRawImage, *d_dataRawImage, *d_imageOutput, *h_imageOutput;
-	
-	dataRawImage = (unsigned char*)malloc(size);
-	cudaMalloc((void**)&d_dataRawImage,size);
 
-	h_imageOutput = (unsigned char *)malloc(sizeGray);
-	cudaMalloc((void**)&d_imageOutput,sizeGray);
+  for (int i = 0; i < 20; i++){
+    
+  	dataRawImage = (unsigned char*)malloc(size);
+  	cudaMalloc((void**)&d_dataRawImage,size);
 
-	dataRawImage = image.data;
+  	h_imageOutput = (unsigned char *)malloc(sizeGray);
+  	cudaMalloc((void**)&d_imageOutput,sizeGray);
 
-	startGPU = clock();
+  	dataRawImage = image.data;
 
-	cudaMemcpy(d_dataRawImage,dataRawImage,size, cudaMemcpyHostToDevice);
+  	startGPU = clock();
 
-	int blockSize = 32;
-  dim3 dimBlock(blockSize,blockSize,1);
-  dim3 dimGrid(ceil(width/float(blockSize)),ceil(height/float(blockSize)),1);
-  PictureKernell<<<dimGrid,dimBlock>>>(d_dataRawImage,width,height,d_imageOutput);
-  cudaDeviceSynchronize();
-  
-  cudaMemcpy(h_imageOutput,d_imageOutput,sizeGray,cudaMemcpyDeviceToHost);
+  	cudaMemcpy(d_dataRawImage,dataRawImage,size, cudaMemcpyHostToDevice);
 
-  endGPU = clock();
+  	int blockSize = 32;
+    dim3 dimBlock(blockSize,blockSize,1);
+    dim3 dimGrid(ceil(width/float(blockSize)),ceil(height/float(blockSize)),1);
+    PictureKernell<<<dimGrid,dimBlock>>>(d_dataRawImage,width,height,d_imageOutput);
+    cudaDeviceSynchronize();
+    
+    cudaMemcpy(h_imageOutput,d_imageOutput,sizeGray,cudaMemcpyDeviceToHost);
 
-  Mat gray_image;
-  gray_image.create(height,width,CV_8UC1);
-  gray_image.data = h_imageOutput;
+    endGPU = clock();
 
- 	start = clock();
-  Mat gray_image_opencv;
-  cvtColor(image, gray_image_opencv, CV_BGR2GRAY);
-  end = clock();
+    Mat gray_image;
+    gray_image.create(height,width,CV_8UC1);
+    gray_image.data = h_imageOutput;
 
-  //imwrite("./Gray_Image.jpg",gray_image);
+   	start = clock();
+    Mat gray_image_opencv;
+    cvtColor(image, gray_image_opencv, CV_BGR2GRAY);
+    end = clock();
 
-  //namedWindow(name, WINDOW_NORMAL);
-  //namedWindow("Gray Image CUDA", WINDOW_NORMAL);
-  //namedWindow("Gray Image OpenCV", WINDOW_NORMAL);
+    //imwrite("./Gray_Image.jpg",gray_image);
 
-  //imshow(name,image);
-  //imshow("Gray Image CUDA", gray_image);
-  //imshow("Gray Image OpenCV",gray_image_opencv);
+    //namedWindow(name, WINDOW_NORMAL);
+    //namedWindow("Gray Image CUDA", WINDOW_NORMAL);
+    //namedWindow("Gray Image OpenCV", WINDOW_NORMAL);
 
-  //waitKey(0);
+    //imshow(name,image);
+    //imshow("Gray Image CUDA", gray_image);
+    //imshow("Gray Image OpenCV",gray_image_opencv);
 
-  gpu_time_used = ((double) (endGPU - startGPU)) / CLOCKS_PER_SEC;
-  cpu_time_used = ((double) (end - start)) /CLOCKS_PER_SEC;
-  double aceleration = cpu_time_used/gpu_time_used;
+    //waitKey(0);
 
-  printf("Tiempo Algoritmo Paralelo: %.10f\n",gpu_time_used);
-  printf("Tiempo Algoritmo OpenCV: %.10f\n",cpu_time_used);
-  printf("La aceleración obtenida es de %.10fX\n",aceleration);
+    gpu_time_used = ((double) (endGPU - startGPU)) / CLOCKS_PER_SEC;
+    cpu_time_used = ((double) (end - start)) /CLOCKS_PER_SEC;
+    double aceleration = cpu_time_used/gpu_time_used;
 
-  ofstream outfile("Times",ios::binary | ios::app);
-  outfile << gpu_time_used<<" "<< cpu_time_used <<" "<< aceleration << "\n";
-  outfile.close();
+    printf("Tiempo Algoritmo Paralelo: %.10f\n",gpu_time_used);
+    printf("Tiempo Algoritmo OpenCV: %.10f\n",cpu_time_used);
+    printf("La aceleración obtenida es de %.10fX\n",aceleration);
 
-  cudaFree(d_dataRawImage);
-  cudaFree(d_imageOutput);
+    ofstream outfile("Times"+name,ios::binary | ios::app);
+    outfile << gpu_time_used<<" "<< cpu_time_used <<" "<< aceleration << "\n";
+    outfile.close();
+
+    cudaFree(d_dataRawImage);
+    cudaFree(d_imageOutput);
+  }
 	return 0;
 	
 }
