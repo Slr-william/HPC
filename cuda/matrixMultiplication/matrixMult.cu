@@ -4,6 +4,7 @@
 #include <cuda.h>
 #include <fstream>
 
+using namespace std;
 
 __global__ void MatrixMulKernel(float *d_M, float *d_N, float *d_P,int width){
 	int Row = blockIdx.y*blockDim.y + threadIdx.y;
@@ -88,7 +89,7 @@ int main(int argc, char const *argv[])
 
         std::string name =  "TimesMult.txt"+num;
 
-        std::ofstream outfile(name,ios::binary | ios::app);
+        ofstream outfile(name,ios::binary | ios::app);
         outfile << gpu_time_used<<" "<< cpu_time_used <<" "<< aceleration << "\n";
         outfile.close();
 
