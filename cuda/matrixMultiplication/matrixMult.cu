@@ -2,6 +2,8 @@
 #include <string>
 #include <stdio.h>
 #include <cuda.h>
+#include <fstream>
+
 
 __global__ void MatrixMulKernel(float *d_M, float *d_N, float *d_P,int width){
 	int Row = blockIdx.y*blockDim.y + threadIdx.y;
@@ -83,7 +85,7 @@ int main(int argc, char const *argv[])
         printf("Tiempo algoritmo paralelo: %.10f\n", gpu_time_used);
         printf("La aceleración obtenida es de %.10fX\n",aceleration);
 
-        string name =  "TimesMult.txt"+to_string(width);
+        std::string name =  "TimesMult.txt"+std::to_string(width);
 
         ofstream outfile(name,ios::binary | ios::app);
         outfile << gpu_time_used<<" "<< cpu_time_used <<" "<< aceleration << "\n";
