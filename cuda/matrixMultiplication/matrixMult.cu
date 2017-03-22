@@ -16,7 +16,7 @@ __global__ void MatrixMulKernel(float *d_M, float *d_N, float *d_P,int width){
 	}
 }
 
-int matrixMulHost(int *h_M, int *h_N, int *h_P, int width){
+int matrixMulHost(float *h_M, float *h_N, float *h_P, int width){
     int Pvalue;
 
     for(int row = 0; row < width ; ++row){
@@ -31,7 +31,7 @@ int matrixMulHost(int *h_M, int *h_N, int *h_P, int width){
     return 0;
 }
 
-int initValues(int *data, int width){
+int initValues(float *data, int width){
     for(int i = 0; i < width*width; i++)
         data[i] = 2;
     return 0;
@@ -39,17 +39,17 @@ int initValues(int *data, int width){
 
 int main(int argc, char const *argv[])
 {
-	int *h_M, *h_N, *h_P,*h_P_d;
-    int *d_M, *d_N,*d_P;
+	float *h_M, *h_N, *h_P,*h_P_d;
+    float *d_M, *d_N,*d_P;
     int width = 128;
-    int size = width * width * sizeof(int);
+    int size = width * width * sizeof(float);
     clock_t start, end, startGPU, endGPU;
     double cpu_time_used, gpu_time_used, aceleration;
 
-    h_M = (int*)malloc(size);
-    h_N = (int*)malloc(size);
-    h_P = (int*)malloc(size);
-    h_P_d = (int*)malloc(size);
+    h_M = (float*)malloc(size);
+    h_N = (float*)malloc(size);
+    h_P = (float*)malloc(size);
+    h_P_d = (float*)malloc(size);
 
     initValues(h_M, width);
     initValues(h_N, width);
