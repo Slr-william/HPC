@@ -77,8 +77,8 @@ int main(int argc, char const *argv[])
     cudaDeviceSynchronize();
     cudaMemcpy(h_P_d,d_P,size,cudaMemcpyDeviceToHost);
     endGPU = clock();
-    aceleration = cpu_time_used/gpu_time_used;
     gpu_time_used = ((double) (endGPU - startGPU)) / CLOCKS_PER_SEC;
+    aceleration = cpu_time_used/gpu_time_used;
     printf("Tiempo algoritmo paralelo: %.10f\n", gpu_time_used);
     printf("La aceleración obtenida es de %.10fX\n",aceleration);
 
