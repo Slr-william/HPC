@@ -43,7 +43,8 @@ int main(int argc, char const *argv[])
 {
 	float *h_M, *h_N, *h_P,*h_P_d;
     float *d_M, *d_N,*d_P;
-    int width = argv[1];
+    std::string num = argv[1];
+    int width = std::stoi(num);
     int size = width * width * sizeof(float);
     clock_t start, end, startGPU, endGPU;
     double cpu_time_used, gpu_time_used, aceleration;
@@ -85,7 +86,7 @@ int main(int argc, char const *argv[])
         printf("Tiempo algoritmo paralelo: %.10f\n", gpu_time_used);
         printf("La aceleración obtenida es de %.10fX\n",aceleration);
 
-        std::string name =  "TimesMult.txt"+std::to_string(width);
+        std::string name =  "TimesMult.txt"+num;
 
         ofstream outfile(name,ios::binary | ios::app);
         outfile << gpu_time_used<<" "<< cpu_time_used <<" "<< aceleration << "\n";
