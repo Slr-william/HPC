@@ -95,7 +95,7 @@ int main(int argc, char *argv[]){
   printf("La aceleración obtenida es de %.10fX\n",aceleration);
 
   ofstream outfile("Times",ios::binary | ios::app);
-  outfile << gpu_time_used << cpu_time_used << aceleration;
+  outfile << gpu_time_used<<" "<< cpu_time_used <<" "<< aceleration << "\n";
   outfile.close();
 
   cudaFree(d_dataRawImage);
