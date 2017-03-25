@@ -50,7 +50,7 @@ int main(int argc, char const *argv[])
     clock_t start, end, startGPU, endGPU;
     double cpu_time_used, gpu_time_used, aceleration;
 
-    for (int times = 0; times < 20; times++){
+   for (int times = 0; times < 20; times++){
         h_M = (float*)malloc(size);
         h_N = (float*)malloc(size);
         h_P = (float*)malloc(size);
