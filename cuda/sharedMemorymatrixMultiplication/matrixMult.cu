@@ -70,6 +70,13 @@ int main(int argc, char const *argv[])
         h_N = (float*)malloc(size);
         h_P = (float*)malloc(size);
         h_P_d = (float*)malloc(size);
+        start = 0;
+        end = 0;
+        startGPU = 0;
+        endGPU = 0;
+        cpu_time_used = 0;
+        gpu_time_used = 0;
+        aceleration = 0;
 
         initValues(h_M, width);
         initValues(h_N, width);
