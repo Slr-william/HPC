@@ -12,7 +12,7 @@ __global__ void MatrixMulKernel(float *d_M, float *d_N, float *d_P,int width){
 	__shared__ float Mds[TILE_WIDTH][TILE_WIDTH];
 	__shared__ float Nds[TILE_WIDTH][TILE_WIDTH];
 
-	int bx = blockIdx.y; int by = blockIdx.y;
+	int bx = blockIdx.x; int by = blockIdx.y;
 	int tx = threadIdx.x; int ty = threadIdx.y;
 	
 	int row = by * TILE_WIDTH + ty;
@@ -22,8 +22,8 @@ __global__ void MatrixMulKernel(float *d_M, float *d_N, float *d_P,int width){
 
 	for (int i = 0; i < width/TILE_WIDTH; ++i){
 
-		Mds[ty][tx] = d_M[row*width + m*TILE_WIDTH + tx];
-		Nds[ty][tx] =  d_N[(m*TILE_WIDTH + ty) *width + col];
+		Mds[ty][tx] = d_M[row*width + i*TILE_WIDTH + tx];
+		Nds[ty][tx] =  d_N[(i*TILE_WIDTH + ty) *width + col];
 		__syncthreads();
 
 		for (int j = 0; j < TILE_WIDTH; ++j){
