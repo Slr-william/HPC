@@ -82,7 +82,7 @@ int printData(float *data, int width){
 int main(int argc, char const *argv[]){
     int repeat = 1;
 
-    if (argc != 2 or argc != 3){
+    if (argc != 2 && argc != 3){
         printf("args[1] = size of matrix, %s","args[2] = times to repeat");
         return -1;
     }
