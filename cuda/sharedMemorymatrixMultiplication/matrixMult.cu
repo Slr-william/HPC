@@ -55,6 +55,13 @@ int initValues(float *data, int width){
     return 0;
 }
 
+void print(float*data, int width){
+    for (int i = 0; i < width*width; i++){
+        printf(" %f ",data[i]);
+        if(width%i = 0){printf("\n");}
+    }
+}
+
 int main(int argc, char const *argv[])
 {
 	float *h_M, *h_N, *h_P,*h_P_d;
@@ -65,18 +72,11 @@ int main(int argc, char const *argv[])
     clock_t start, end, startGPU, endGPU;
     double cpu_time_used, gpu_time_used, aceleration;
 
-   for (int times = 0; times < 20; times++){
+   //for (int times = 0; times < 20; times++){
         h_M = (float*)malloc(size);
         h_N = (float*)malloc(size);
         h_P = (float*)malloc(size);
         h_P_d = (float*)malloc(size);
-        start = 0;
-        end = 0;
-        startGPU = 0;
-        endGPU = 0;
-        cpu_time_used = 0;
-        gpu_time_used = 0;
-        aceleration = 0;
 
         initValues(h_M, width);
         initValues(h_N, width);
@@ -106,6 +106,9 @@ int main(int argc, char const *argv[])
         endGPU = clock();
         gpu_time_used = ((double) (endGPU - startGPU)) / CLOCKS_PER_SEC;
         aceleration = cpu_time_used/gpu_time_used;
+
+        print(h_P_d,width);
+
         printf("Tiempo algoritmo paralelo: %.10f\n", gpu_time_used);
         printf("La aceleración obtenida es de %.10fX\n",aceleration);
 
@@ -122,7 +125,7 @@ int main(int argc, char const *argv[])
         cudaFree(d_M);
         cudaFree(d_N);
         cudaFree(d_P);
-    }
+    //}
 
 	return 0;
 }
