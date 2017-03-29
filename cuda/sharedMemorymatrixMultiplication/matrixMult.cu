@@ -55,11 +55,16 @@ int initValues(float *data, int width){
     return 0;
 }
 
-void print(float*data, int width){
+int print(float *data, int width){
     for (int i = 0; i < width*width; i++){
-        printf(" %f ",data[i]);
-        if(width%i = 0){printf("\n");}
+        printf("%f ",data[i]);
+        if(i!=0){
+		if(width%i == 0){
+			printf("%s \n"," ");
+		}
+	}
     }
+    return 0;
 }
 
 int main(int argc, char const *argv[])
@@ -107,6 +112,7 @@ int main(int argc, char const *argv[])
         gpu_time_used = ((double) (endGPU - startGPU)) / CLOCKS_PER_SEC;
         aceleration = cpu_time_used/gpu_time_used;
 
+	printf("%s \n","here i am");
         print(h_P_d,width);
 
         printf("Tiempo algoritmo paralelo: %.10f\n", gpu_time_used);
