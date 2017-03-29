@@ -19,9 +19,9 @@ __global__ void MatrixMulKernel(float *d_M, float *d_N, float *d_P,int width){
 	int col = bx * TILE_WIDTH + tx;
 
 	float Pvalue = 0;
-    printf("%f\n", width/TILE_WIDTH );
+    //printf("%f\n", width/TILE_WIDTH );
 	for (int i = 0; i < width/TILE_WIDTH; ++i){
-        printf("%d\n", i );
+        //printf("%d\n", i );
 
 		Mds[ty][tx] = d_M[row*width + i*TILE_WIDTH + tx];
 		Nds[ty][tx] =  d_N[(i*TILE_WIDTH + ty)*width + col];
@@ -103,9 +103,8 @@ int main(int argc, char const *argv[])
         cudaMemcpy(d_M, h_M, size, cudaMemcpyHostToDevice);
         cudaMemcpy(d_N, h_N, size, cudaMemcpyHostToDevice);
 
-        int blockSize = 32;
-        dim3 dimBlock(blockSize,blockSize,1);
-        dim3 dimGrid(ceil(width/float(blockSize)),ceil(width/float(blockSize)),1);
+        dim3 dimBlock(TILE_WIDTH,TILE_WIDTH);
+        dim3 dimGrid(ceil(width/TILE_WIDTH),ceil(width/TILE_WIDTH));
         MatrixMulKernel<<<dimGrid,dimBlock>>>(d_M,d_N,d_P,width);
         cudaDeviceSynchronize();
         cudaMemcpy(h_P_d,d_P,size,cudaMemcpyDeviceToHost);
