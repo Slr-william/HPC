@@ -127,7 +127,7 @@ int main(int argc, char const *argv[])
         free(h_M);
         free(h_N);
         free(h_P);
-        free(h_P_d);
+        //free(h_P_d);
         cudaFree(d_M);
         cudaFree(d_N);
         cudaFree(d_P);
