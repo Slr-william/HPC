@@ -84,6 +84,8 @@ int main(int argc, char const *argv[])
         initValues(h_M, width);
         initValues(h_N, width);
 
+        printData(h_M, width);
+
         /////////Algoritmo Secuencial////////////////////////////////////////////
         start = clock();
         matrixMulHost(h_M, h_N, h_P, width);
