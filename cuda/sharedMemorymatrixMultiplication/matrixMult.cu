@@ -49,6 +49,19 @@ int matrixMulHost(float *h_M, float *h_N, float *h_P, int width){
     }
     return 0;
 }
+int testValues(float *A, float *B, int width){
+
+    for(int i = 0; i < width; ++i){
+        for(int j = 0; j < width; ++j){
+            if(A[(i*width)+j]!=B[(i*width)+j]){
+                printf("Mal Cálculo...\n");
+                return 0;
+            }
+        }
+    }
+    printf("Buen Cálculo ...\n");
+    return 0;
+}
 
 int initValues(float *data, int width){
     for(int i = 0; i < width*width; i++)
@@ -114,6 +127,7 @@ int main(int argc, char const *argv[])
 
 	    printf("%s \n","here i am");
         //printData(h_P_d,width);
+	testValues(h_P_d,h_P,width);
 
         printf("Tiempo algoritmo paralelo: %.10f\n", gpu_time_used);
         printf("La aceleración obtenida es de %.10fX\n",aceleration);
