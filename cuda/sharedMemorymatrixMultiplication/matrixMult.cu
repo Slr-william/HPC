@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#define TILE_WIDTH 32
+#define TILE_WIDTH 16
 
 __global__ void MatrixMulKernel(float *d_M, float *d_N, float *d_P,int width){
 	__shared__ float Mds[TILE_WIDTH][TILE_WIDTH];
@@ -19,7 +19,7 @@ __global__ void MatrixMulKernel(float *d_M, float *d_N, float *d_P,int width){
 	int col = bx * TILE_WIDTH + tx;
 
 	float Pvalue = 0;
-
+    printf("%f\n", width/TILE_WIDTH );
 	for (int i = 0; i < width/TILE_WIDTH; ++i){
         printf("%d\n", i );
 
@@ -85,7 +85,7 @@ int main(int argc, char const *argv[])
         initValues(h_M, width);
         initValues(h_N, width);
 
-        printData(h_M, width);
+        //printData(h_M, width);
 
         /////////Algoritmo Secuencial////////////////////////////////////////////
         start = clock();
