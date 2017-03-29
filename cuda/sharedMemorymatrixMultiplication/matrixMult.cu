@@ -21,6 +21,7 @@ __global__ void MatrixMulKernel(float *d_M, float *d_N, float *d_P,int width){
 	float Pvalue = 0;
 
 	for (int i = 0; i < width/TILE_WIDTH; ++i){
+        printf("%d\n", i );
 
 		Mds[ty][tx] = d_M[row*width + i*TILE_WIDTH + tx];
 		Nds[ty][tx] =  d_N[(i*TILE_WIDTH + ty)*width + col];
