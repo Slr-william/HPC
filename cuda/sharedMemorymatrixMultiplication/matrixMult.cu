@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#define TILE_WIDTH 16
+#define TILE_WIDTH 32
 
 __global__ void MatrixMulKernel(float *d_M, float *d_N, float *d_P,int width){
 	__shared__ float Mds[TILE_WIDTH][TILE_WIDTH];
@@ -23,7 +23,7 @@ __global__ void MatrixMulKernel(float *d_M, float *d_N, float *d_P,int width){
 	for (int i = 0; i < width/TILE_WIDTH; ++i){
 
 		Mds[ty][tx] = d_M[row*width + i*TILE_WIDTH + tx];
-		Nds[ty][tx] =  d_N[(i*TILE_WIDTH + ty) *width + col];
+		Nds[ty][tx] =  d_N[(i*TILE_WIDTH + ty)*width + col];
 		__syncthreads();
 
 		for (int j = 0; j < TILE_WIDTH; ++j){
