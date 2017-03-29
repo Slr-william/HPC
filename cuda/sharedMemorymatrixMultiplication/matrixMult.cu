@@ -19,7 +19,7 @@ __global__ void MatrixMulKernel(float *d_M, float *d_N, float *d_P,int width){
 	int col = bx * TILE_WIDTH + tx;
 
 	float Pvalue = 0;
-    //printf("%f\n", width/TILE_WIDTH );
+    	//printf("%f\n", width/TILE_WIDTH );
 	for (int i = 0; i < width/TILE_WIDTH; ++i){
         //printf("%d\n", i );
 
@@ -51,8 +51,8 @@ int matrixMulHost(float *h_M, float *h_N, float *h_P, int width){
 }
 int testValues(float *A, float *B, int width){
 
-    for(int i = 0; i < width; ++i){
-        for(int j = 0; j < width; ++j){
+    for(int i = 0; i < width; i++){
+        for(int j = 0; j < width; j++){
             if(A[(i*width)+j]!=B[(i*width)+j]){
                 printf("Calculation error...\n");
                 return 0;
@@ -129,7 +129,7 @@ int main(int argc, char const *argv[]){
         gpu_time_used = ((double) (endGPU - startGPU)) / CLOCKS_PER_SEC;
         aceleration = cpu_time_used/gpu_time_used;
 
-	    printf("%s \n","here i am");
+	//printf("%s \n","here i am");
         //printData(h_P_d,width);
 	    testValues(h_P_d,h_P,width);
 
