@@ -54,12 +54,12 @@ int testValues(float *A, float *B, int width){
     for(int i = 0; i < width; ++i){
         for(int j = 0; j < width; ++j){
             if(A[(i*width)+j]!=B[(i*width)+j]){
-                printf("Mal Cálculo...\n");
+                printf("Calculation error...\n");
                 return 0;
             }
         }
     }
-    printf("Buen Cálculo ...\n");
+    printf("Good Calculations ...\n");
     return 0;
 }
 
@@ -79,17 +79,24 @@ int printData(float *data, int width){
     return 0;
 }
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]){
+    int repeat = 1;
+
+    if (argc != 2 or argc != 3){
+        printf("args[1] = size of matrix, %s","args[2] = times to repeat");
+        return -1;
+    }
+
 	float *h_M, *h_N, *h_P,*h_P_d;
     float *d_M, *d_N,*d_P;
     std::string num = argv[1];
+    repeat = std::stoi(argv[2]);
     int width = std::stoi(num);
     int size = width * width * sizeof(float);
     clock_t start, end, startGPU, endGPU;
     double cpu_time_used, gpu_time_used, aceleration;
 
-   for (int times = 0; times < 20; times++){
+   for (int times = 0; times < repeat; times++){
         h_M = (float*)malloc(size);
         h_N = (float*)malloc(size);
         h_P = (float*)malloc(size);
@@ -100,18 +107,15 @@ int main(int argc, char const *argv[])
 
         //printData(h_M, width);
 
-        /////////Algoritmo Secuencial////////////////////////////////////////////
         start = clock();
         matrixMulHost(h_M, h_N, h_P, width);
         end = clock();
         cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-        printf("Tiempo algoritmo secuencial: %.10f\n", cpu_time_used);
-        /////////Algoritmo Secuencial/////////////////////////////////////////////
+        printf("Time sequential: %.10f\n", cpu_time_used);
 
         cudaMalloc((void**)&d_M,size);
         cudaMalloc((void**)&d_N,size);
         cudaMalloc((void**)&d_P,size);
-        //////////////////////Algoritmo Paralelo///////////////////////////
         startGPU = clock();
         cudaMemcpy(d_M, h_M, size, cudaMemcpyHostToDevice);
         cudaMemcpy(d_N, h_N, size, cudaMemcpyHostToDevice);
@@ -127,10 +131,10 @@ int main(int argc, char const *argv[])
 
 	    printf("%s \n","here i am");
         //printData(h_P_d,width);
-	testValues(h_P_d,h_P,width);
+	    testValues(h_P_d,h_P,width);
 
-        printf("Tiempo algoritmo paralelo: %.10f\n", gpu_time_used);
-        printf("La aceleración obtenida es de %.10fX\n",aceleration);
+        printf("Time parallel: %.10f\n", gpu_time_used);
+        printf("Aceleration: %.10fX\n",aceleration);
 
         std::string name =  "TimesMult.txt"+num;
 
@@ -141,7 +145,7 @@ int main(int argc, char const *argv[])
         free(h_M);
         free(h_N);
         free(h_P);
-        //free(h_P_d);
+        free(h_P_d);
         cudaFree(d_M);
         cudaFree(d_N);
         cudaFree(d_P);
