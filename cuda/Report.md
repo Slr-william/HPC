@@ -3,7 +3,8 @@ Introducción
 
 El fin de este documento es comprobar que hay una diferencia en rendimiento entre la computación paralela respecto a la secuencial, por qué sucede este aumento o disminución en la velocidad de procesamiento y que ventajas nos da usar memoria compartida en procesamiento paralelo, esto para el procesamiento de imágenes con OPENCV y la multiplicación de matrices. El lenguaje de programación usado para realizar estas pruebas fue c++/cuda.
 
-Comparación procesamiento de imágenes con opencv (CPU vs GPU)
+## Comparación procesamiento de imágenes con opencv (CPU vs GPU)
+
 En la siguiente imagen se muestra una gráfica en la que se puede observar el desempeño de la función ‘cvtColor’ de OPENCV que utiliza CPU y un algoritmo paralelo con GPU, estos algoritmos se probaron con las mismas imágenes, cada una de diferente tamaño.
 
 |Imagen| dimensiones|tamaño|
@@ -93,7 +94,7 @@ Como se puede apreciar, el rendimiento del algoritmo con memoria compartida es m
  
  ![alt text](https://github.com/Slr-william/HPC/blob/master/cuda/imagen%208.PNG)
  
-La aceleración respecto al algoritmo sin memoria compartida es el poco más del doble después de tener una matriz de 1000 elementos.
+La aceleración respecto al algoritmo sin memoria compartida es poco más del doble después de tener una matriz de 1000 elementos.
 
 ### Conclusión 
 
