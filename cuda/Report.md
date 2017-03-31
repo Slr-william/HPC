@@ -1,9 +1,8 @@
-Introducción
-------------
+### Introducción
 
 El fin de este documento es comprobar que hay una diferencia en rendimiento entre la computación paralela respecto a la secuencial, por qué sucede este aumento o disminución en la velocidad de procesamiento y que ventajas nos da usar memoria compartida en procesamiento paralelo, esto para el procesamiento de imágenes con OPENCV y la multiplicación de matrices. El lenguaje de programación usado para realizar estas pruebas fue c++/cuda.
 
-## Comparación procesamiento de imágenes con opencv (CPU vs GPU)
+### Comparación procesamiento de imágenes con opencv (CPU vs GPU)
 
 En la siguiente imagen se muestra una gráfica en la que se puede observar el desempeño de la función ‘cvtColor’ de OPENCV que utiliza CPU y un algoritmo paralelo con GPU, estos algoritmos se probaron con las mismas imágenes, cada una de diferente tamaño.
 
@@ -32,7 +31,7 @@ __global__ void PictureKernell(unsigned char *imageInput, int width, int height,
 	}
 }
 ```
-## Comparación multiplicación de matrices
+### Comparación multiplicación de matrices
 
 Para esta comparación se utilizaron matrices de tamaño 128, 512, 1024, 2048 y 4096, en algoritmos secuencial y paralelo.
  
