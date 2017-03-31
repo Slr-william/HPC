@@ -22,6 +22,7 @@ En la siguiente imagen se muestra una gráfica en la que se puede observar el de
 
 Como se puede observar para imágenes pequeñas la aceleración respecto al algoritmo secuencial es variable, pero superior, para imágenes mayores esta comienza a aproximarse a 3 por lo que se puede decir que el algoritmo paralelo es tres veces más rápido que el secuencial. Sin embargo, su desempeño podría ser mejor.
 El siguiente código es el kernel usado para el procesamiento de imágenes, pero este puede ser mejorado usando memoria compartida además de ajustando los bloques e hilos usados para obtener un mejor rendimiento.
+
 ```cpp
 __global__ void PictureKernell(unsigned char *imageInput, int width, int height, unsigned char *imageOutput){
 	int row = blockIdx.y*blockDim.y+threadIdx.y;
@@ -31,7 +32,6 @@ __global__ void PictureKernell(unsigned char *imageInput, int width, int height,
 	}
 }
 ```
-
 ## Comparación multiplicación de matrices
 
 Para esta comparación se utilizaron matrices de tamaño 128, 512, 1024, 2048 y 4096, en algoritmos secuencial y paralelo.
@@ -43,7 +43,9 @@ Para esta comparación se utilizaron matrices de tamaño 128, 512, 1024, 2048 y 
 Como se puede observar el desempeño del algoritmo paralelo en GPU para matrices con tamaños pequeños no tiene mucha diferencia con el secuencial, para tamaños grandes superiores a 2000 su diferencia comienza a ser importante.
 Aunque el desempeño del algoritmo paralelo es muy superior al secuencial se puede mejorar más utilizando memoria compartida.
 
+
 ### Kernel sin memoria compartida:
+
 ```cpp
 __global__ void MatrixMulKernel(float *d_M, float *d_N, float *d_P,int width){
 	int Row = blockIdx.y*blockDim.y + threadIdx.y;
@@ -92,7 +94,7 @@ En las siguientes gráficas se muestra una comparativa de rendimiento entre el a
 
 Como se puede apreciar, el rendimiento del algoritmo con memoria compartida es mucho mejor a el que no la utiliza, esto como se dijo anteriormente se debe a que la memoria compartida es de mucho más rápido acceso que la memoria global.
  
- ![alt text](https://github.com/Slr-william/HPC/blob/master/cuda/imagen%208.PNG)
+![alt text](https://github.com/Slr-william/HPC/blob/master/cuda/imagen%208.PNG)
  
 La aceleración respecto al algoritmo sin memoria compartida es poco más del doble después de tener una matriz de 1000 elementos.
 
