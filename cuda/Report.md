@@ -19,15 +19,16 @@ En la siguiente imagen se muestra una gráfica en la que se puede observar el de
 
 ![alt text](https://github.com/Slr-william/HPC/blob/master/cuda/report/imagen%202.PNG)
 
-Como se puede observar para imágenes pequeñas la aceleración respecto al algoritmo secuencial es variable, pero superior, para imágenes mayores esta comienza a aproximarse a 3 por lo que se puede decir que el algoritmo paralelo es tres veces más rápido que el secuencial. Sin embargo, su desempeño podría ser mejor.
-El siguiente código es el kernel usado para el procesamiento de imágenes, pero este puede ser mejorado usando memoria compartida además de ajustando los bloques e hilos usados para obtener un mejor rendimiento.
+Como se puede notar para imágenes pequeñas la aceleración respecto al algoritmo secuencial es variable, pero superior, para imágenes mayores esta comienza a aproximarse a 3 por lo que se puede decir que el algoritmo paralelo es tres veces más rápido que el secuencial. Sin embargo, su desempeño podría ser mejor.
+El siguiente código es el kernel usado para el procesamiento de imágenes, pero este puede ser mejorado usando memoria compartida además de ajustar los bloques e hilos usados para obtener un mejor rendimiento.
 
 ```cpp
 __global__ void PictureKernell(unsigned char *imageInput, int width, int height, unsigned char *imageOutput){
 	int row = blockIdx.y*blockDim.y+threadIdx.y;
 	int col = blockIdx.x*blockDim.x+threadIdx.x;
 	if((row < height) && (col < width)){
-	imageOutput[row*width+col] = imageInput[(row*width+col)*3+RED]*0.299 + 	imageInput[(row*width+col)*3+GREEN]*0.587 + 	imageInput[(row*width+col)*3+BLUE]*0.114;
+	imageOutput[row*width+col] = imageInput[(row*width+col)*3+RED]*0.299 + 	
+	imageInput[(row*width+col)*3+GREEN]*0.587 + imageInput[(row*width+col)*3+BLUE]*0.114;
 	}
 }
 ```
@@ -35,9 +36,15 @@ __global__ void PictureKernell(unsigned char *imageInput, int width, int height,
 
 Para esta comparación se utilizaron matrices de tamaño 128, 512, 1024, 2048 y 4096, en algoritmos secuencial y paralelo.
  
- ![alt text](https://github.com/Slr-william/HPC/blob/master/cuda/report/imagen%203.PNG)
- ![alt text](https://github.com/Slr-william/HPC/blob/master/cuda/report/imagen%204.PNG)
- ![alt text](https://github.com/Slr-william/HPC/blob/master/cuda/report/imagen%205.PNG)
+![alt text](https://github.com/Slr-william/HPC/blob/master/cuda/report/imagen%203.PNG)
+
+Como se muestra en la figura anterior la curva que hacen los dos algoritmos son muy parecidas, pero a diferencia de gráfica de CPU, la de GPU tiene tiempos mucho menores, en la siguiente imagen se muestran las curvas juntas.
+
+![alt text](https://github.com/Slr-william/HPC/blob/master/cuda/report/imagen%204.PNG)
+
+En la figuiente imagen se muestra la que eficiencia del algoritmo paralelo tiende a crecer de forma logaritmica respecto a la multiplicación de matrices secuencial.
+
+![alt text](https://github.com/Slr-william/HPC/blob/master/cuda/report/imagen%205.PNG)
 
 Como se puede observar el desempeño del algoritmo paralelo en GPU para matrices con tamaños pequeños no tiene mucha diferencia con el secuencial, para tamaños grandes superiores a 2000 su diferencia comienza a ser importante.
 Aunque el desempeño del algoritmo paralelo es muy superior al secuencial se puede mejorar más utilizando memoria compartida.
@@ -109,6 +116,7 @@ La aceleración respecto al algoritmo sin memoria compartida es poco más del do
 ### Anexo
 
 #### Tiempos promedio de imagenes
+
 | Nombre de imagen | Tiempo prom(GPU) | Tiempo prom(CPU) | Tiempo prom(aceleración) | 
 |------------------|------------------|------------------|--------------------------| 
 | Crash            | 0.00016625       | 0.0007245        | 4.2346495                | 
@@ -118,6 +126,7 @@ La aceleración respecto al algoritmo sin memoria compartida es poco más del do
 
 
 #### Tiempos promedio de multiplicación de matrices
+
 | N    | Tiempos prom(GPU) | Tiempos prom(CPU) | Aceleración | 
 |------|-------------------|-------------------|-------------| 
 | 128  | 0.0001116         | 0.0080233         | 71.82663    | 
@@ -127,6 +136,7 @@ La aceleración respecto al algoritmo sin memoria compartida es poco más del do
 | 4096 | 0.711967          | 625.435           | 878.461     | 
 
 #### Tiempos promedio de multiplicación de matrices con memoria compartida
+
 | N    | GPU(sm)     | GPU        | Aceleración | 
 |------|-------------|------------|-------------| 
 | 128  | 0.000082050 | 0.0001116  | 1.360146252 | 
