@@ -103,3 +103,33 @@ La aceleración respecto al algoritmo sin memoria compartida es poco más del do
 * El utilizar memoria compartida en GPU aumenta considerablemente el rendimiento, pero se debe tener en cuenta el tamaño de la memoria compartida en la GPU.
 
 * La memoria compartida sólo es accesible por los hilos de un mismo bloque.
+
+
+### Anexo
+
+#### Tiempos promedio de imagenes
+| Nombre de imagen | Tiempo prom(GPU) | Tiempo prom(CPU) | Tiempo prom(aceleración) | 
+|------------------|------------------|------------------|--------------------------| 
+| Crash            | 0.00016625       | 0.0007245        | 4.2346495                | 
+| natalie          | 0.00338045       | 0.00876105       | 2.599498                 | 
+| moon             | 0.0047239        | 0.01453325       | 3.0823685                | 
+| landscape        | 0.01052215       | 0.0319395        | 3.0397215                | 
+
+
+#### Tiempos promedio de multiplicación de matrices
+| N    | Tiempos prom(GPU) | Tiempos prom(CPU) | Aceleración | 
+|------|-------------------|-------------------|-------------| 
+| 128  | 0.0001116         | 0.0080233         | 71.82663    | 
+| 512  | 0.0023784         | 0.53549595        | 225.2168    | 
+| 1024 | 0.01379815        | 4.3116845         | 312.4832    | 
+| 2048 | 0.10350995        | 60.22562          | 582.3944    | 
+| 4096 | 0.711967          | 625.435           | 878.461     | 
+
+#### Tiempos promedio de multiplicación de matrices con memoria compartida
+| N    | GPU(sm)     | GPU        | Aceleración | 
+|------|-------------|------------|-------------| 
+| 128  | 0.000082050 | 0.0001116  | 1.360146252 | 
+| 512  | 0.00110385  | 0.0023784  | 2.154640576 | 
+| 1024 | 0.00534495  | 0.01379815 | 2.581530229 | 
+| 2048 | 0.0394175   | 0.10350995 | 2.625989725 |
+
