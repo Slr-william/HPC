@@ -54,7 +54,7 @@ __global__ void img2gray(unsigned char *imageInput, int width, int height, unsig
 int main(int argc, char **argv){
     cudaError_t error = cudaSuccess;
     clock_t start, end;
-    double cpu_time_used, gpu_time_used;
+    double cpu_time_used;
     char h_Mask[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1}, *d_Mask;
     char* imageName = argv[1];
     unsigned char *h_dataImage, *d_dataImage, *d_imageOutput, *h_imageOutput, *d_sobelOutput;
