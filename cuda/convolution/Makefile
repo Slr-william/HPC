@@ -1,4 +1,6 @@
-CUDAC = nvcc -std=c++11
+CUDAC = nvcc
+CFLAGS = `pkg-config --cflags opencv`
+LIBS = `pkg-config --libs opencv`
 
 convolution: convolution.cu
-	$(CUDAC) convolution.cu -o convolution.out -O3
+	$(CUDAC) $(CFLAGS) convolution.cu $(LIBS) -o convolution.out -O3
