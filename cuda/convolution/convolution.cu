@@ -11,6 +11,7 @@
 
 using namespace cv;
 
+
 __device__ unsigned char clamp(int value){
     if(value < 0)
         value = 0;
