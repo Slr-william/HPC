@@ -8,3 +8,6 @@ convolution: convolution.cu
 smconvolution: smconvolution.cu
 	$(CUDAC) $(CFLAGS) smconvolution.cu $(LIBS) -o smconvolution.out -O3
 
+opencvConcolutionCuda: opencvConcolutionCuda.cu
+	$(CUDAC) $(CFLAGS) opencvConcolutionCuda.cu $(LIBS) -o opencvConcolutionCuda.out -O3
+
