@@ -72,7 +72,7 @@ int main(int argc, char **argv){
         return -1;
     }
     char* imageName = argv[1];
-    int times = atoi(argv[2]);
+    times = atoi(argv[2]);
 
     Mat image;
     image = imread(imageName, 1);
@@ -153,8 +153,8 @@ int main(int argc, char **argv){
 
         //waitKey(0);
 
-        free(h_dataImage);
-        free(h_imageOutput);
+        //free(h_dataImage);
+        //free(h_imageOutput);
         cpu_time_used = ((double) (end - start)) /CLOCKS_PER_SEC;
         printf("Time in CPU: %.10f, time in GPU: %.10f\n", cpu_time_used, milliseconds);
 
