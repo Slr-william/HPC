@@ -81,7 +81,7 @@ int main(int argc, char **argv){
     cudaError_t error = cudaSuccess;
     clock_t start, end;
     double cpu_time_used;
-    CMask[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
+    char h_CMask[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
     char* imageName = argv[1];
     unsigned char *h_dataImage, *d_dataImage, *d_imageOutput, *h_imageOutput, *d_sobelOutput;
     cudaEvent_t startGPU, stopGPU;
@@ -102,6 +102,8 @@ int main(int argc, char **argv){
     int size = sizeof(unsigned char)*width*height*image.channels();
     int sizeGray = sizeof(unsigned char)*width*height;
 
+    error = cudaMemcpyToSymbol(CMask,h_CMask,sizeof(char)*MASK_WIDTH*MASK_WIDTH);
+    if(error != cudaSuccess){printf("Error in Mask \n");exit(-1);}
 
     h_dataImage = (unsigned char*)malloc(size);
     error = cudaMalloc((void**)&d_dataImage, size);
