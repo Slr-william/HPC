@@ -105,16 +105,16 @@ int main(int argc, char **argv){
     img2gray<<<dimGrid, dimBlock>>>(d_dataImage, width, height, d_imageOutput);
     cudaDeviceSynchronize();
 
-    cudaEventRecord(start);
+    cudaEventRecord(startGPU);
     sobelFilter<<<dimGrid, dimBlock>>>(d_imageOutput, width, height, 3, d_Mask, d_sobelOutput);
     cudaDeviceSynchronize();
-    cudaEventRecord(stop);
+    cudaEventRecord(stopGPU);
 
     error = cudaMemcpy(h_imageOutput, d_sobelOutput, sizeGray, cudaMemcpyDeviceToHost);
     if(error != cudaSuccess){printf("Error sending data from device to host in imageOutput\n");exit(-1);}
-    cudaEventSynchronize(stop);
+    cudaEventSynchronize(stopGPU);
     float milliseconds = 0;
-    cudaEventElapsedTime(float &milliseconds, start, stop);
+    cudaEventElapsedTime(float &milliseconds, startGPU, stopGPU);
 
     Mat gray_image;
     gray_image.create(height, width, CV_8UC1);
