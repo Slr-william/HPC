@@ -1,7 +1,8 @@
-#include <cv.h>
-#include <highgui.h>
 #include <time.h>
 #include <cuda.h>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp> // import no include errors 
 
 #define RED 2
 #define GREEN 1
