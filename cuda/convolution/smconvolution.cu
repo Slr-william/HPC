@@ -4,6 +4,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp> // import no include errors 
+#include <fstream>
+#include <string>
 
 #define RED 2
 #define GREEN 1
@@ -15,6 +17,7 @@
 __constant__ char CMask[MASK_WIDTH*MASK_WIDTH];
 
 using namespace cv;
+using namespace std;
 
 __device__ unsigned char clamp(int value){
     if(value < 0)
@@ -88,13 +91,19 @@ int main(int argc, char **argv){
     cudaEvent_t startGPU, stopGPU;
     cudaEventCreate(&startGPU);
     cudaEventCreate(&stopGPU);
+    int times = 1;
+
+    if(argc !=3){
+        printf("Enter the image's name and to repeat \n");
+        return -1;
+    }
+    char* imageName = argv[1];
+    times = atoi(argv[2]);
+
     Mat image;
     image = imread(imageName, 1);
 
-    if(argc !=2 || !image.data){
-        printf("Enter the image's name \n");
-        return -1;
-    }
+    if(!image.data){return -1;}
 
     Size s = image.size();
 
@@ -103,70 +112,79 @@ int main(int argc, char **argv){
     int size = sizeof(unsigned char)*width*height*image.channels();
     int sizeGray = sizeof(unsigned char)*width*height;
 
-    error = cudaMemcpyToSymbol(CMask,h_CMask,sizeof(char)*MASK_WIDTH*MASK_WIDTH);
-    if(error != cudaSuccess){printf("Error in Mask \n");exit(-1);}
+    string text  = string(imageName)+"SMTimes";
 
-    h_dataImage = (unsigned char*)malloc(size);
-    error = cudaMalloc((void**)&d_dataImage, size);
-    if(error != cudaSuccess){printf("Error-> memory allocation of d_dataImage\n");exit(-1);}
+    for (int i = 0; i < times; i++){
 
-    h_imageOutput = (unsigned char *)malloc(sizeGray);
-    error = cudaMalloc((void**)&d_imageOutput, sizeGray);
-    if(error != cudaSuccess){printf("Error-> memory allocation of d_imageOutput\n");exit(-1);}
+        error = cudaMemcpyToSymbol(CMask,h_CMask,sizeof(char)*MASK_WIDTH*MASK_WIDTH);
+        if(error != cudaSuccess){printf("Error in Mask \n");exit(-1);}
 
-    error = cudaMalloc((void**)&d_sobelOutput, sizeGray);
-    if(error != cudaSuccess){printf("Error-> memory allocation of d_sobelOutput\n");exit(-1);}
+        h_dataImage = (unsigned char*)malloc(size);
+        error = cudaMalloc((void**)&d_dataImage, size);
+        if(error != cudaSuccess){printf("Error-> memory allocation of d_dataImage\n");exit(-1);}
 
-    h_dataImage = image.data;
+        h_imageOutput = (unsigned char *)malloc(sizeGray);
+        error = cudaMalloc((void**)&d_imageOutput, sizeGray);
+        if(error != cudaSuccess){printf("Error-> memory allocation of d_imageOutput\n");exit(-1);}
 
-    error = cudaMemcpy(d_dataImage, h_dataImage, size, cudaMemcpyHostToDevice);
-    if(error != cudaSuccess){printf("Error sending data from host to device in dataImage\n");exit(-1);}
+        error = cudaMalloc((void**)&d_sobelOutput, sizeGray);
+        if(error != cudaSuccess){printf("Error-> memory allocation of d_sobelOutput\n");exit(-1);}
 
+        h_dataImage = image.data;
 
-    int blockSize = TILE_SIZE;
-    dim3 dimBlock(blockSize, blockSize, 1);
-    dim3 dimGrid(ceil(width/float(blockSize)), ceil(height/float(blockSize)), 1);
-    img2gray<<<dimGrid, dimBlock>>>(d_dataImage, width, height, d_imageOutput);
-    cudaDeviceSynchronize();
-
-    cudaEventRecord(startGPU);
-    sobelFilterSM<<<dimGrid, dimBlock>>>(d_imageOutput, width, height, MASK_WIDTH, d_sobelOutput);
-    cudaDeviceSynchronize();
-    cudaEventRecord(stopGPU);
-
-    error = cudaMemcpy(h_imageOutput, d_sobelOutput, sizeGray, cudaMemcpyDeviceToHost);
-    if(error != cudaSuccess){printf("Error sending data from device to host in imageOutput\n");exit(-1);}
-    cudaEventSynchronize(stopGPU);
-    float milliseconds = 0;
-    cudaEventElapsedTime(&milliseconds, startGPU, stopGPU);
-
-    Mat image_sobel;
-    image_sobel.create(height, width, CV_8UC1);
-    image_sobel.data = h_imageOutput;
-
-    start = clock();
-    Mat image_sobel_opencv, grad_x, abs_grad_x;
-    cvtColor(image, image_sobel_opencv, CV_BGR2GRAY);
-    Sobel(image_sobel_opencv, grad_x, CV_8UC1, 1, 0, 3, 1, 0, BORDER_DEFAULT);
-    convertScaleAbs(grad_x, abs_grad_x);
-    end = clock();
+        error = cudaMemcpy(d_dataImage, h_dataImage, size, cudaMemcpyHostToDevice);
+        if(error != cudaSuccess){printf("Error sending data from host to device in dataImage\n");exit(-1);}
 
 
-    //imwrite("./SMImage.jpg",image_sobel);
+        int blockSize = TILE_SIZE;
+        dim3 dimBlock(blockSize, blockSize, 1);
+        dim3 dimGrid(ceil(width/float(blockSize)), ceil(height/float(blockSize)), 1);
+        img2gray<<<dimGrid, dimBlock>>>(d_dataImage, width, height, d_imageOutput);
+        cudaDeviceSynchronize();
 
-    // namedWindow(imageName, WINDOW_NORMAL);
-    //namedWindow("Gray Image CUDA", WINDOW_NORMAL);
-    // namedWindow("Sobel Image OpenCV", WINDOW_NORMAL);
-    // imshow(imageName,image);
-    //imshow("Gray Image CUDA", image_sobel);
-    // imshow("Sobel Image OpenCV",abs_grad_x);
-    //waitKey(0);
+        cudaEventRecord(startGPU);
+        sobelFilterSM<<<dimGrid, dimBlock>>>(d_imageOutput, width, height, MASK_WIDTH, d_sobelOutput);
+        cudaDeviceSynchronize();
+        cudaEventRecord(stopGPU);
 
-    cpu_time_used = ((double) (end - start)) /CLOCKS_PER_SEC;
-    printf("Time in CPU: %.10f, time in GPU: %.10f\n", cpu_time_used, milliseconds);
+        error = cudaMemcpy(h_imageOutput, d_sobelOutput, sizeGray, cudaMemcpyDeviceToHost);
+        if(error != cudaSuccess){printf("Error sending data from device to host in imageOutput\n");exit(-1);}
+        cudaEventSynchronize(stopGPU);
+        float milliseconds = 0;
+        cudaEventElapsedTime(&milliseconds, startGPU, stopGPU);
 
-    cudaFree(d_dataImage);
-    cudaFree(d_imageOutput);
-    cudaFree(d_sobelOutput);
+        Mat image_sobel;
+        image_sobel.create(height, width, CV_8UC1);
+        image_sobel.data = h_imageOutput;
+
+        start = clock();
+        Mat image_sobel_opencv, grad_x, abs_grad_x;
+        cvtColor(image, image_sobel_opencv, CV_BGR2GRAY);
+        Sobel(image_sobel_opencv, grad_x, CV_8UC1, 1, 0, 3, 1, 0, BORDER_DEFAULT);
+        convertScaleAbs(grad_x, abs_grad_x);
+        end = clock();
+
+
+        //imwrite("./SMImage.jpg",image_sobel);
+
+        // namedWindow(imageName, WINDOW_NORMAL);
+        //namedWindow("Gray Image CUDA", WINDOW_NORMAL);
+        // namedWindow("Sobel Image OpenCV", WINDOW_NORMAL);
+        // imshow(imageName,image);
+        //imshow("Gray Image CUDA", image_sobel);
+        // imshow("Sobel Image OpenCV",abs_grad_x);
+        //waitKey(0);
+
+        cpu_time_used = ((double) (end - start)) /CLOCKS_PER_SEC;
+        printf("Time in CPU: %.10f, time in GPU: %.10f\n", cpu_time_used, milliseconds);
+
+        ofstream outfile(text.c_str(),ios::binary | ios::app);
+        outfile << cpu_time_used <<" "<< milliseconds << "\n";
+        outfile.close();
+
+        cudaFree(d_dataImage);
+        cudaFree(d_imageOutput);
+        cudaFree(d_sobelOutput);
+    }
     return 0;
 }
