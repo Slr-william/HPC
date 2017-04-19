@@ -86,7 +86,6 @@ int main(int argc, char **argv){
     clock_t start, end;
     double cpu_time_used;
     char h_CMask[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
-    char* imageName = argv[1];
     unsigned char *h_dataImage, *d_dataImage, *d_imageOutput, *h_imageOutput, *d_sobelOutput;
     cudaEvent_t startGPU, stopGPU;
     cudaEventCreate(&startGPU);
