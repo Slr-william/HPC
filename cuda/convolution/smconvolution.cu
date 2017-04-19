@@ -28,22 +28,23 @@ __device__ unsigned char clamp(int value){
 
 __global__ void sobelFilterSM(unsigned char *imageInput, int width, int height, \
         unsigned int maskWidth,unsigned char *imageOutput){
+
     __shared__ float N_ds[TILE_SIZE + MASK_WIDTH - 1][TILE_SIZE+ MASK_WIDTH - 1];
-    int n = maskWidth/2;
-    int dest = threadIdx.y*TILE_SIZE+threadIdx.x, destY = dest / (TILE_SIZE+MASK_WIDTH-1), destX = dest % (TILE_SIZE+MASK_WIDTH-1),
+
+    int n = maskWidth/2, dest = threadIdx.y*TILE_SIZE+threadIdx.x, destY = dest / (TILE_SIZE+MASK_WIDTH-1), destX = dest % (TILE_SIZE+MASK_WIDTH-1),
         srcY = blockIdx.y * TILE_SIZE + destY - n, srcX = blockIdx.x * TILE_SIZE + destX - n,
         src = (srcY * width + srcX);
-    if (srcY >= 0 && srcY < height && srcX >= 0 && srcX < width)
-        N_ds[destY][destX] = imageInput[src];
-    else
-        N_ds[destY][destX] = 0;
 
-    // Second batch loading
+    if (srcY >= 0 && srcY < height && srcX >= 0 && srcX < width){N_ds[destY][destX] = imageInput[src];}
+    else{N_ds[destY][destX] = 0;}
+
     dest = threadIdx.y * TILE_SIZE + threadIdx.x + TILE_SIZE * TILE_SIZE;
     destY = dest /(TILE_SIZE + MASK_WIDTH - 1), destX = dest % (TILE_SIZE + MASK_WIDTH - 1);
+
     srcY = blockIdx.y * TILE_SIZE + destY - n;
     srcX = blockIdx.x * TILE_SIZE + destX - n;
     src = (srcY * width + srcX);
+
     if (destY < TILE_SIZE + MASK_WIDTH - 1) {
         if (srcY >= 0 && srcY < height && srcX >= 0 && srcX < width)
             N_ds[destY][destX] = imageInput[src];
@@ -52,13 +53,13 @@ __global__ void sobelFilterSM(unsigned char *imageInput, int width, int height, 
     }
     __syncthreads();
 
-    int accum = 0;
-    int y, x;
+    int accum = 0, y, x;
     for (y = 0; y < maskWidth; y++)
         for (x = 0; x < maskWidth; x++)
             accum += N_ds[threadIdx.y + y][threadIdx.x + x] * CMask[y * maskWidth + x];
     y = blockIdx.y * TILE_SIZE + threadIdx.y;
     x = blockIdx.x * TILE_SIZE + threadIdx.x;
+    
     if (y < height && x < width)
         imageOutput[(y * width + x)] = clamp(accum);
     __syncthreads();
@@ -139,30 +140,28 @@ int main(int argc, char **argv){
     float milliseconds = 0;
     cudaEventElapsedTime(&milliseconds, startGPU, stopGPU);
 
-    Mat gray_image;
-    gray_image.create(height, width, CV_8UC1);
-    gray_image.data = h_imageOutput;
+    Mat image_sobel;
+    image_sobel.create(height, width, CV_8UC1);
+    image_sobel.data = h_imageOutput;
 
     start = clock();
-    Mat gray_image_opencv, grad_x, abs_grad_x;
-    cvtColor(image, gray_image_opencv, CV_BGR2GRAY);
-    Sobel(gray_image_opencv, grad_x, CV_8UC1, 1, 0, 3, 1, 0, BORDER_DEFAULT);
+    Mat image_sobel_opencv, grad_x, abs_grad_x;
+    cvtColor(image, image_sobel_opencv, CV_BGR2GRAY);
+    Sobel(image_sobel_opencv, grad_x, CV_8UC1, 1, 0, 3, 1, 0, BORDER_DEFAULT);
     convertScaleAbs(grad_x, abs_grad_x);
     end = clock();
 
 
-    imwrite("./Sobel_Image.jpg",gray_image);
+    //imwrite("./SMImage.jpg",image_sobel);
 
-  // namedWindow(imageName, WINDOW_NORMAL);
-   namedWindow("Gray Image CUDA", WINDOW_NORMAL);
-  // namedWindow("Sobel Image OpenCV", WINDOW_NORMAL);
-  // imshow(imageName,image);
-   imshow("Gray Image CUDA", gray_image);
-  // imshow("Sobel Image OpenCV",abs_grad_x);
-   waitKey(0);
+    // namedWindow(imageName, WINDOW_NORMAL);
+    //namedWindow("Gray Image CUDA", WINDOW_NORMAL);
+    // namedWindow("Sobel Image OpenCV", WINDOW_NORMAL);
+    // imshow(imageName,image);
+    //imshow("Gray Image CUDA", image_sobel);
+    // imshow("Sobel Image OpenCV",abs_grad_x);
+    //waitKey(0);
 
-    //free(h_dataImage);
-    //free(h_imageOutput);
     cpu_time_used = ((double) (end - start)) /CLOCKS_PER_SEC;
     printf("Time in CPU: %.10f, time in GPU: %.10f\n", cpu_time_used, milliseconds);
 
