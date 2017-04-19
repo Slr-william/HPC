@@ -153,16 +153,16 @@ int main(int argc, char **argv){
 
     imwrite("./Sobel_Image.jpg",gray_image);
 
-   namedWindow(imageName, WINDOW_NORMAL);
+  // namedWindow(imageName, WINDOW_NORMAL);
    namedWindow("Gray Image CUDA", WINDOW_NORMAL);
-   namedWindow("Sobel Image OpenCV", WINDOW_NORMAL);
-   imshow(imageName,image);
+  // namedWindow("Sobel Image OpenCV", WINDOW_NORMAL);
+  // imshow(imageName,image);
    imshow("Gray Image CUDA", gray_image);
-   imshow("Sobel Image OpenCV",abs_grad_x);
+  // imshow("Sobel Image OpenCV",abs_grad_x);
    waitKey(0);
 
-    free(h_dataImage);
-    free(h_imageOutput);
+    //free(h_dataImage);
+    //free(h_imageOutput);
     cpu_time_used = ((double) (end - start)) /CLOCKS_PER_SEC;
     printf("Time in CPU: %.10f, time in GPU: %.10f\n", cpu_time_used, milliseconds);
 
