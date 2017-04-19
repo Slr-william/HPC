@@ -128,7 +128,7 @@ int main(int argc, char **argv){
     end = clock();
 
 
-    imwrite("./Sobel_Image.jpg", gray_image);
+    imwrite("./sobel.jpg", gray_image);
 
     namedWindow(imageName, WINDOW_NORMAL);
     namedWindow("Gray Image CUDA", WINDOW_NORMAL);
