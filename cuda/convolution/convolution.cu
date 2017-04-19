@@ -114,7 +114,7 @@ int main(int argc, char **argv){
     if(error != cudaSuccess){printf("Error sending data from device to host in imageOutput\n");exit(-1);}
     cudaEventSynchronize(stopGPU);
     float milliseconds = 0;
-    cudaEventElapsedTime(float &milliseconds, startGPU, stopGPU);
+    cudaEventElapsedTime(&milliseconds, startGPU, stopGPU);
 
     Mat gray_image;
     gray_image.create(height, width, CV_8UC1);
