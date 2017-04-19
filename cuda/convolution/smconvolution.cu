@@ -12,7 +12,7 @@
 
 #define MASK_WIDTH 3
 
-__constant__ char M[MASK_WIDTH*MASK_WIDTH];
+__constant__ char CMask[MASK_WIDTH*MASK_WIDTH];
 
 using namespace cv;
 
@@ -56,7 +56,7 @@ __global__ void sobelFilterSM(unsigned char *imageInput, int width, int height, 
     int y, x;
     for (y = 0; y < maskWidth; y++)
         for (x = 0; x < maskWidth; x++)
-            accum += N_ds[threadIdx.y + y][threadIdx.x + x] * M[y * maskWidth + x];
+            accum += N_ds[threadIdx.y + y][threadIdx.x + x] * CMask[y * maskWidth + x];
     y = blockIdx.y * TILE_SIZE + threadIdx.y;
     x = blockIdx.x * TILE_SIZE + threadIdx.x;
     if (y < height && x < width)
@@ -81,7 +81,7 @@ int main(int argc, char **argv){
     cudaError_t error = cudaSuccess;
     clock_t start, end;
     double cpu_time_used;
-    char h_Mask[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1}, *d_Mask;
+    char CMask[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
     char* imageName = argv[1];
     unsigned char *h_dataImage, *d_dataImage, *d_imageOutput, *h_imageOutput, *d_sobelOutput;
     cudaEvent_t startGPU, stopGPU;
@@ -111,9 +111,6 @@ int main(int argc, char **argv){
     error = cudaMalloc((void**)&d_imageOutput, sizeGray);
     if(error != cudaSuccess){printf("Error-> memory allocation of d_imageOutput\n");exit(-1);}
 
-    error = cudaMalloc((void**)&d_Mask, sizeof(char)*9);
-    if(error != cudaSuccess){printf("Error-> memory allocation of d_Mask\n");exit(-1);}
-
     error = cudaMalloc((void**)&d_sobelOutput, sizeGray);
     if(error != cudaSuccess){printf("Error-> memory allocation of d_sobelOutput\n");exit(-1);}
 
@@ -121,9 +118,6 @@ int main(int argc, char **argv){
 
     error = cudaMemcpy(d_dataImage, h_dataImage, size, cudaMemcpyHostToDevice);
     if(error != cudaSuccess){printf("Error sending data from host to device in dataImage\n");exit(-1);}
-
-    error = cudaMemcpy(d_Mask, h_Mask, sizeof(char)*9, cudaMemcpyHostToDevice);
-    if(error != cudaSuccess){printf("Error sending data from host to device in Mask \n");exit(-1);}
 
 
     int blockSize = TILE_SIZE;
@@ -172,7 +166,6 @@ int main(int argc, char **argv){
 
     cudaFree(d_dataImage);
     cudaFree(d_imageOutput);
-    cudaFree(d_Mask);
     cudaFree(d_sobelOutput);
     return 0;
 }
