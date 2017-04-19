@@ -165,14 +165,14 @@ int main(int argc, char **argv){
    imshow("Sobel Image OpenCV",abs_grad_x);
    waitKey(0);
 
-    free(dataRawImage);
+    free(h_dataImage);
     free(h_imageOutput);
     cpu_time_used = ((double) (end - start)) /CLOCKS_PER_SEC;
-    printf("CPU: %.10f, GPU: %.10f\n",cpu_time_used, milliseconds);
+    printf("Time in CPU: %.10f, time in GPU: %.10f\n", cpu_time_used, milliseconds);
 
-    cudaFree(d_dataRawImage);
+    cudaFree(d_dataImage);
     cudaFree(d_imageOutput);
-    cudaFree(M);
+    cudaFree(d_Mask);
     cudaFree(d_sobelOutput);
     return 0;
 }
