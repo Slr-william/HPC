@@ -14,7 +14,7 @@
 using namespace cv;
 using namespace std;
 
-#define MASK_WIDTH 9;
+#define MASK_WIDTH 9
 
 __constant__ float constMask[MASK_WIDTH];
 
@@ -63,12 +63,12 @@ int main(int argc, char **argv){
     clock_t start, end;
     int times = 1;
     double cpu_time_used;
-    char h_Mask[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
+    float h_Mask[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
     unsigned char *h_dataImage, *d_dataImage, *d_imageOutput, *h_imageOutput, *d_sobelOutput;
     cudaEvent_t startGPU, stopGPU;
     cudaEventCreate(&startGPU);
     cudaEventCreate(&stopGPU);
-    
+    int maskWidth = MASK_WIDTH;
 
     if(argc !=3){
         printf("Enter the image's name and to repeat \n");
@@ -110,7 +110,8 @@ int main(int argc, char **argv){
         error = cudaMemcpy(d_dataImage, h_dataImage, size, cudaMemcpyHostToDevice);
         if(error != cudaSuccess){printf("Error sending data from host to device in dataImage\n");exit(-1);}
 
-        cudaMemcpyToSymbol(constMask, h_Mask, MASK_WIDTH*sizeof(float));
+        error = cudaMemcpyToSymbol(constMask, h_Mask, maskWidth*sizeof(float));
+	if(error != cudaSuccess){printf("Error in const memory\n");exit(-1);}
 
         int blockSize = 32;
         dim3 dimBlock(blockSize, blockSize, 1);
@@ -119,7 +120,7 @@ int main(int argc, char **argv){
         cudaDeviceSynchronize();
 
         cudaEventRecord(startGPU);
-        sobelFilter<<<dimGrid, dimBlock>>>(d_imageOutput, width, height, MASK_WIDTH, d_sobelOutput);
+        sobelFilter<<<dimGrid, dimBlock>>>(d_imageOutput, width, height, maskWidth, d_sobelOutput);
         cudaDeviceSynchronize();
         cudaEventRecord(stopGPU);
 
@@ -143,15 +144,15 @@ int main(int argc, char **argv){
 
         //imwrite("./sobel.jpg", gray_image);
 
-        //namedWindow(imageName, WINDOW_NORMAL);
+        namedWindow(imageName, WINDOW_NORMAL);
         namedWindow("Gray Image CUDA", WINDOW_NORMAL);
         //namedWindow("Sobel Image OpenCV", WINDOW_NORMAL);
 
-        //imshow(imageName, image);
+        imshow(imageName, image);
         imshow("Gray Image CUDA", gray_image);
         //imshow("Sobel Image OpenCV", abs_grad_x);
 
-        //waitKey(0);
+        waitKey(0);
 
         //free(h_dataImage);
         //free(h_imageOutput);

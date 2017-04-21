@@ -7,3 +7,8 @@ convolution: convolution.cu
 
 smconvolution: smconvolution.cu
 	$(CUDAC) $(CFLAGS) smconvolution.cu $(LIBS) -o smconvolution.out -O3
+
+constConvolution: constConvolution.cu
+	$(CUDAC) $(CFLAGS) constConvolution.cu $(LIBS) -o constConvolution.out -O3
+
+
