@@ -15,7 +15,7 @@ using namespace cv;
 using namespace std;
 
 #define MASK_WIDTH 3
-#define TILE_SIZE 32;
+#define TILE_SIZE 32
 
 __device__ unsigned char clamp(int value){
     if(value < 0)
@@ -27,12 +27,10 @@ __device__ unsigned char clamp(int value){
 }
 
 __global__ void sobelFilterSM(unsigned char *imageInput, int width, int height, unsigned int maskWidth, float * d_Mask, unsigned char *imageOutput){
-
     __shared__ float N_ds[TILE_SIZE + MASK_WIDTH - 1][TILE_SIZE+ MASK_WIDTH - 1];
 
-    int n = maskWidth/2, dest = threadIdx.y*TILE_SIZE+threadIdx.x, destY = dest / (TILE_SIZE+MASK_WIDTH-1), destX = dest % (TILE_SIZE+MASK_WIDTH-1),
-        srcY = blockIdx.y * TILE_SIZE + destY - n, srcX = blockIdx.x * TILE_SIZE + destX - n,
-        src = (srcY * width + srcX);
+    int n = maskWidth/2, dest = threadIdx.y*TILE_SIZE+threadIdx.x, destY = dest / (TILE_SIZE+MASK_WIDTH-1), destX = dest % (TILE_SIZE+MASK_WIDTH-1);
+    int srcY = blockIdx.y * TILE_SIZE + destY - n, srcX = blockIdx.x * TILE_SIZE + destX - n, src = (srcY * width + srcX);
 
     if (srcY >= 0 && srcY < height && srcX >= 0 && srcX < width){N_ds[destY][destX] = imageInput[src];}
     else{N_ds[destY][destX] = 0;}
@@ -55,7 +53,7 @@ __global__ void sobelFilterSM(unsigned char *imageInput, int width, int height, 
     int accum = 0, y, x;
     for (y = 0; y < maskWidth; y++)
         for (x = 0; x < maskWidth; x++)
-            accum += N_ds[threadIdx.y + y][threadIdx.x + x] * CMask[y * maskWidth + x];
+            accum += N_ds[threadIdx.y + y][threadIdx.x + x] * d_Mask[y * maskWidth + x];
     y = blockIdx.y * TILE_SIZE + threadIdx.y;
     x = blockIdx.x * TILE_SIZE + threadIdx.x;
     
