@@ -140,7 +140,7 @@ int main(int argc, char **argv){
         cudaDeviceSynchronize();
 
         cudaEventRecord(startGPU);
-        sobelFilter<<<dimGrid, dimBlock>>>(d_imageOutput, width, height, maskWidth, d_Mask, d_sobelOutput);
+        sobelFilterSM<<<dimGrid, dimBlock>>>(d_imageOutput, width, height, maskWidth, d_Mask, d_sobelOutput);
         cudaDeviceSynchronize();
         cudaEventRecord(stopGPU);
 
