@@ -17,7 +17,7 @@ using namespace std;
 #define MASK_WIDTH 3
 #define TILE_SIZE 32
 
-__device__ unsigned char clamp(int value){
+__device__ unsigned char setNumber(int value){
     if(value < 0)
         value = 0;
     else
@@ -58,7 +58,7 @@ __global__ void sobelFilterSM(unsigned char *imageInput, int width, int height, 
     x = blockIdx.x * TILE_SIZE + threadIdx.x;
     
     if (y < height && x < width)
-        imageOutput[(y * width + x)] = clamp(accum);
+        imageOutput[(y * width + x)] = setNumber(accum);
     __syncthreads();
 }
 
@@ -86,9 +86,14 @@ int main(int argc, char **argv){
     cudaEventCreate(&stopGPU);
     int maskWidth = MASK_WIDTH;
 
-    if(argc !=3){
+    if(argc !=3 || argc != 4){
         printf("Enter the image's name and to repeat \n");
         return -1;
+    }
+    
+    bool writeImage = false;
+    if (argc == 4){
+        writeImage = true;
     }
 
     char* imageName = argv[1];
@@ -106,7 +111,7 @@ int main(int argc, char **argv){
     int size = sizeof(unsigned char)*width*height*image.channels();
     int sizeGray = sizeof(unsigned char)*width*height;
 
-    string text  = string(imageName)+"Times";
+    string text  = string(imageName)+"SharedMTimes";
 
     for (int i = 0; i < times; i++)
     {
@@ -162,7 +167,10 @@ int main(int argc, char **argv){
         end = clock();
 
 
-        //imwrite("./sobel.jpg", gray_image);
+        if (writeImage){
+            imwrite("./SMsobel.jpg", gray_image);
+            writeImage = false;
+        }
 
         namedWindow(imageName, WINDOW_NORMAL);
         namedWindow("Gray Image CUDA", WINDOW_NORMAL);
@@ -180,7 +188,7 @@ int main(int argc, char **argv){
         printf("Time in CPU: %.10f, time in GPU: %.10f\n", cpu_time_used, milliseconds);
 
         ofstream outfile(text.c_str(),ios::binary | ios::app);
-        outfile << cpu_time_used <<" "<< milliseconds << "\n";
+        outfile << cpu_time_used*1000 <<", "<< milliseconds << "\n";
         outfile.close();
 
         cudaFree(d_dataImage);

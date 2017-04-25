@@ -15,7 +15,7 @@ using namespace cv;
 using namespace std;
 
 
-__device__ unsigned char clamp(int value){
+__device__ unsigned char setNumber(int value){
     if(value < 0)
         value = 0;
     else
@@ -41,7 +41,7 @@ __global__ void sobelFilter(unsigned char *imageInput, int width, int height, un
             }
         }
     }
-    imageOutput[row*width+col] = clamp(Pvalue);
+    imageOutput[row*width+col] = setNumber(Pvalue);
 }
 
 __global__ void img2gray(unsigned char *imageInput, int width, int height, unsigned char *imageOutput){
@@ -66,11 +66,16 @@ int main(int argc, char **argv){
     cudaEventCreate(&startGPU);
     cudaEventCreate(&stopGPU);
     
-
-    if(argc !=3){
+    if(argc !=3 || argc != 4){
         printf("Enter the image's name and to repeat \n");
         return -1;
     }
+    
+    bool writeImage = false;
+    if (argc == 4){
+        writeImage = true;
+    }
+
     char* imageName = argv[1];
     times = atoi(argv[2]);
 
@@ -86,7 +91,7 @@ int main(int argc, char **argv){
     int size = sizeof(unsigned char)*width*height*image.channels();
     int sizeGray = sizeof(unsigned char)*width*height;
 
-    string text  = string(imageName)+"Times";
+    string text  = string(imageName)+"normalTimes";
 
     for (int i = 0; i < times; i++)
     {
@@ -139,9 +144,11 @@ int main(int argc, char **argv){
         Sobel(gray_image_opencv, grad_x, CV_8UC1, 1, 0, 3, 1, 0, BORDER_DEFAULT);
         convertScaleAbs(grad_x, abs_grad_x);
         end = clock();
-
-
-        //imwrite("./sobel.jpg", gray_image);
+        
+        if (writeImage){
+            imwrite("./SMsobel.jpg", gray_image);
+            writeImage = false;
+        }
 
         //namedWindow(imageName, WINDOW_NORMAL);
         //namedWindow("Gray Image CUDA", WINDOW_NORMAL);
@@ -159,7 +166,7 @@ int main(int argc, char **argv){
         printf("Time in CPU: %.10f, time in GPU: %.10f\n", cpu_time_used, milliseconds);
 
         ofstream outfile(text.c_str(),ios::binary | ios::app);
-        outfile << cpu_time_used <<" "<< milliseconds << "\n";
+        outfile << cpu_time_used*1000 <<", "<< milliseconds << "\n";
         outfile.close();
 
         cudaFree(d_dataImage);
