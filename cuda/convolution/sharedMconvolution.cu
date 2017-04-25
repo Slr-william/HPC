@@ -26,28 +26,42 @@ __device__ unsigned char clamp(int value){
     return (unsigned char)value;
 }
 
+__global__ void sobelFilterSM(unsigned char *imageInput, int width, int height, unsigned int maskWidth, float * d_Mask, unsigned char *imageOutput){
 
-__global__ void sobelFilter(unsigned char *imageInput, int width, int height, unsigned int maskWidth,float * d_Mask , unsigned char *imageOutput){
+    __shared__ float N_ds[TILE_SIZE + MASK_WIDTH - 1][TILE_SIZE+ MASK_WIDTH - 1];
 
-    __shared__ float N_ds[TILE_SIZE + MASK_WIDTH -1];
-    __shared__ float M_ds[TILE_SIZE + MASK_WIDTH -1];
+    int n = maskWidth/2, dest = threadIdx.y*TILE_SIZE+threadIdx.x, destY = dest / (TILE_SIZE+MASK_WIDTH-1), destX = dest % (TILE_SIZE+MASK_WIDTH-1),
+        srcY = blockIdx.y * TILE_SIZE + destY - n, srcX = blockIdx.x * TILE_SIZE + destX - n,
+        src = (srcY * width + srcX);
 
-    unsigned int row = blockIdx.y*blockDim.y+threadIdx.y;
-    unsigned int col = blockIdx.x*blockDim.x+threadIdx.x;
+    if (srcY >= 0 && srcY < height && srcX >= 0 && srcX < width){N_ds[destY][destX] = imageInput[src];}
+    else{N_ds[destY][destX] = 0;}
 
-    int Pvalue = 0;
+    dest = threadIdx.y * TILE_SIZE + threadIdx.x + TILE_SIZE * TILE_SIZE;
+    destY = dest /(TILE_SIZE + MASK_WIDTH - 1), destX = dest % (TILE_SIZE + MASK_WIDTH - 1);
 
-    int offsets_row = row - (maskWidth/2);
-    int offsets_col = col - (maskWidth/2);
+    srcY = blockIdx.y * TILE_SIZE + destY - n;
+    srcX = blockIdx.x * TILE_SIZE + destX - n;
+    src = (srcY * width + srcX);
 
-    for(int i = 0; i < maskWidth; i++){
-        for(int j = 0; j < maskWidth; j++ ){
-            if((offsets_col + j >=0 && offsets_col + j < width) && (offsets_row + i >=0 && offsets_row + i < height)){
-                Pvalue += imageInput[(offsets_row + i)*width+(offsets_col + j)] * d_Mask[i*maskWidth+j];
-            }
-        }
+    if (destY < TILE_SIZE + MASK_WIDTH - 1) {
+        if (srcY >= 0 && srcY < height && srcX >= 0 && srcX < width)
+            N_ds[destY][destX] = imageInput[src];
+        else
+            N_ds[destY][destX] = 0;
     }
-    imageOutput[row*width+col] = clamp(Pvalue);
+    __syncthreads();
+
+    int accum = 0, y, x;
+    for (y = 0; y < maskWidth; y++)
+        for (x = 0; x < maskWidth; x++)
+            accum += N_ds[threadIdx.y + y][threadIdx.x + x] * CMask[y * maskWidth + x];
+    y = blockIdx.y * TILE_SIZE + threadIdx.y;
+    x = blockIdx.x * TILE_SIZE + threadIdx.x;
+    
+    if (y < height && x < width)
+        imageOutput[(y * width + x)] = clamp(accum);
+    __syncthreads();
 }
 
 __global__ void img2gray(unsigned char *imageInput, int width, int height, unsigned char *imageOutput){
