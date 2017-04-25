@@ -11,4 +11,7 @@ smconvolution: smconvolution.cu
 constConvolution: constConvolution.cu
 	$(CUDAC) $(CFLAGS) constConvolution.cu $(LIBS) -o constConvolution.out -O3
 
+sharedMconvolution: sharedMconvolution.cu
+	$(CUDAC) $(CFLAGS) sharedMconvolution.cu $(LIBS) -o sharedMconvolution.out -O3
+
 
