@@ -132,7 +132,7 @@ int main(int argc, char **argv){
         error = cudaMemcpy(d_dataImage, h_dataImage, size, cudaMemcpyHostToDevice);
         if(error != cudaSuccess){printf("Error sending data from host to device in dataImage\n");exit(-1);}
 
-        error = cudaMemcpy(d_Mask, h_Mask, sizeof(float)*MASK_WIDTH, cudaMemcpyHostToDevice);
+        error = cudaMemcpy(d_Mask, h_Mask, sizeof(float)*MASK_WIDTH*MASK_WIDTH, cudaMemcpyHostToDevice);
         if(error != cudaSuccess){printf("Error sending data from host to device in dataImage\n");exit(-1);}
 
 
