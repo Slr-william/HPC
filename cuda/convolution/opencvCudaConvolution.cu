@@ -17,7 +17,7 @@ using namespace std;
 
 int main(int argc, char **argv[])
 {
-	if(argc !=3 || argc != 4){
+	if(argc !=3 && argc != 4){
         printf("Enter the image's name and to repeat \n");
         return -1;
     }
