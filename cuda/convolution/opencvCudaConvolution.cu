@@ -36,12 +36,32 @@ int main(int argc, char const *argv[])
     char* imageName = argv[1];
     times = atoi(argv[2]);
 
-	Mat src = imread("car1080.jpg", 0);
-	if (!src.data) exit(1);
-	gpu::GpuMat d_src(src);
-	gpu::GpuMat d_dst;
-	gpu::Sobel(d_src, d_dst, CV_8UC1, 1, 0, 3, 1, 0, BORDER_DEFAULT);
-	Mat dst(d_dst);
-	imwrite("opencvCudaSobel.jpg", dst);
+    Mat src = imread(imageName, 0);
+    if (!src.data) exit(1);
+
+    string text  = string(imageName)+"opencvCudaTimes";
+
+    for (int i = 0; i < times; i++){
+    	gpu::GpuMat d_src(src);
+    	gpu::GpuMat d_dst;
+        cudaEventRecord(startGPU);
+    	gpu::Sobel(d_src, d_dst, CV_8UC1, 1, 0, 3, 1, 0, BORDER_DEFAULT);
+        cudaEventRecord(stopGPU);
+    	Mat dst(d_dst);
+        cudaEventSynchronize(stopGPU);
+        cudaEventElapsedTime(&milliseconds, startGPU, stopGPU);
+
+        if (writeImage)
+        {
+            imwrite("opencvCudaSobel.jpg", dst);
+            writeImage = false;
+        }
+
+        printf("Time in GPU: %.10f\n", cpu_time_used, milliseconds);
+
+        ofstream outfile(text.c_str(),ios::binary | ios::app);
+        outfile << milliseconds << "\n";
+        outfile.close();
+    }
 	return 0;
 }
