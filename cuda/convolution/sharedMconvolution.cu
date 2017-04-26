@@ -92,9 +92,7 @@ int main(int argc, char **argv){
     }
 
     bool writeImage = false;
-    if (argc == 4){
-        writeImage = true;
-    }
+    if (argc == 4){writeImage = true;}
 
     char* imageName = argv[1];
     times = atoi(argv[2]);
@@ -172,7 +170,7 @@ int main(int argc, char **argv){
             writeImage = false;
         }
 
-        namedWindow(imageName, WINDOW_NORMAL);
+        //namedWindow(imageName, WINDOW_NORMAL);
         namedWindow("Gray Image CUDA", WINDOW_NORMAL);
         //namedWindow("Sobel Image OpenCV", WINDOW_NORMAL);
 
