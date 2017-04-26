@@ -134,19 +134,19 @@ int main(int argc, char **argv){
         float milliseconds = 0;
         cudaEventElapsedTime(&milliseconds, startGPU, stopGPU);
 
-        Mat gray_image;
-        gray_image.create(height, width, CV_8UC1);
-        gray_image.data = h_imageOutput;
+        Mat sobel_image;
+        sobel_image.create(height, width, CV_8UC1);
+        sobel_image.data = h_imageOutput;
 
         start = clock();
-        Mat gray_image_opencv, grad_x, abs_grad_x;
-        cvtColor(image, gray_image_opencv, CV_BGR2GRAY);
-        Sobel(gray_image_opencv, grad_x, CV_8UC1, 1, 0, 3, 1, 0, BORDER_DEFAULT);
+        Mat sobel_image_opencv, grad_x, abs_grad_x;
+        cvtColor(image, sobel_image_opencv, CV_BGR2GRAY);
+        Sobel(sobel_image_opencv, grad_x, CV_8UC1, 1, 0, 3, 1, 0, BORDER_DEFAULT);
         convertScaleAbs(grad_x, abs_grad_x);
         end = clock();
-        
+
         if (writeImage){
-            imwrite("./SMsobel.jpg", gray_image);
+            imwrite("./SMsobel.jpg", sobel_image);
             writeImage = false;
         }
 
@@ -155,7 +155,7 @@ int main(int argc, char **argv){
         //namedWindow("Sobel Image OpenCV", WINDOW_NORMAL);
 
         //imshow(imageName, image);
-        //imshow("Gray Image CUDA", gray_image);
+        //imshow("Gray Image CUDA", sobel_image);
         //imshow("Sobel Image OpenCV", abs_grad_x);
 
         //waitKey(0);

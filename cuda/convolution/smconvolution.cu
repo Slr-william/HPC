@@ -171,7 +171,7 @@ int main(int argc, char **argv){
 
 
         if (writeImage){
-            imwrite("./SMsobel.jpg", gray_image);
+            imwrite("./SMsobel.jpg", image_sobel);
             writeImage = false;
         }
 
