@@ -15,12 +15,8 @@
 using namespace cv;
 using namespace std;
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
-	if(argc !=3 && argc != 4){
-        printf("Enter the image's name and to repeat \n");
-        return -1;
-    }
     int times = 1;
     bool writeImage = false;
     cudaEvent_t startGPU, stopGPU;
@@ -28,9 +24,11 @@ int main(int argc, char *argv[])
     cudaEventCreate(&stopGPU);
     float milliseconds;
 
-    if (argc == 4){
-        writeImage = true;
+    if(argc !=3 && argc != 4){
+        printf("Enter the image's name and to repeat \n");
+        return -1;
     }
+    if (argc == 4){writeImage = true;}
 
     char* imageName = argv[1];
     times = atoi(argv[2]);

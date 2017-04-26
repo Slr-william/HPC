@@ -66,7 +66,7 @@ int main(int argc, char **argv){
     cudaEventCreate(&startGPU);
     cudaEventCreate(&stopGPU);
     
-    if(argc !=3 || argc != 4){
+    if(argc !=3 && argc != 4){
         printf("Enter the image's name and to repeat \n");
         return -1;
     }

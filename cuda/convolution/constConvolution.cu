@@ -70,7 +70,7 @@ int main(int argc, char **argv){
     cudaEventCreate(&stopGPU);
     int maskWidth = MASK_WIDTH;
 
-    if(argc !=3 || argc != 4){
+    if(argc !=3 && argc != 4){
         printf("Enter the image's name and to repeat (op w)\n");
         return -1;
     }
