@@ -70,9 +70,14 @@ int main(int argc, char **argv){
     cudaEventCreate(&stopGPU);
     int maskWidth = MASK_WIDTH;
 
-    if(argc !=3){
-        printf("Enter the image's name and to repeat \n");
+    if(argc !=3 || argc != 4){
+        printf("Enter the image's name and to repeat (op w)\n");
         return -1;
+    }
+    
+    bool writeImage = false;
+    if (argc == 4){
+        writeImage = true;
     }
 
     char* imageName = argv[1];
