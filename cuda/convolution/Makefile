@@ -1,6 +1,6 @@
 CUDAC = nvcc
 CFLAGS = `pkg-config --cflags opencv`
-LIBS = `pkg-config --libs opencv
+LIBS = `pkg-config --libs opencv`
 
 all: convolution smconvolution constConvolution sharedMconvolution opencvCudaConvolution
 
