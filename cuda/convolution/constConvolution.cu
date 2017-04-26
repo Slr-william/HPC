@@ -14,9 +14,9 @@
 using namespace cv;
 using namespace std;
 
-#define MASK_WIDTH 9
+#define MASK_WIDTH 3
 
-__constant__ float constMask[MASK_WIDTH];
+__constant__ float constMask[MASK_WIDTH*MASK_WIDTH];
 
 __device__ unsigned char setNumber(int value){
     if(value < 0)
@@ -115,7 +115,7 @@ int main(int argc, char **argv){
         error = cudaMemcpy(d_dataImage, h_dataImage, size, cudaMemcpyHostToDevice);
         if(error != cudaSuccess){printf("Error sending data from host to device in dataImage\n");exit(-1);}
 
-        error = cudaMemcpyToSymbol(constMask, h_Mask, maskWidth*sizeof(float));
+        error = cudaMemcpyToSymbol(constMask, h_Mask, maskWidth*maskWidth*sizeof(float));
 	if(error != cudaSuccess){printf("Error in const memory\n");exit(-1);}
 
         int blockSize = 32;
@@ -128,10 +128,9 @@ int main(int argc, char **argv){
         sobelFilter<<<dimGrid, dimBlock>>>(d_imageOutput, width, height, maskWidth, d_sobelOutput);
         cudaDeviceSynchronize();
         cudaEventRecord(stopGPU);
-
+	cudaEventSynchronize(stopGPU);
         error = cudaMemcpy(h_imageOutput, d_sobelOutput, sizeGray, cudaMemcpyDeviceToHost);
         if(error != cudaSuccess){printf("Error sending data from device to host in imageOutput\n");exit(-1);}
-        cudaEventSynchronize(stopGPU);
         float milliseconds = 0;
         cudaEventElapsedTime(&milliseconds, startGPU, stopGPU);
 
