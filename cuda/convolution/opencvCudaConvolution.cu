@@ -21,13 +21,12 @@ int main(int argc, char const *argv[])
         printf("Enter the image's name and to repeat \n");
         return -1;
     }
-    cudaError_t error = cudaSuccess;
-    clock_t start, end;
     int times = 1;
     bool writeImage = false;
     cudaEvent_t startGPU, stopGPU;
     cudaEventCreate(&startGPU);
     cudaEventCreate(&stopGPU);
+    float milliseconds;
 
     if (argc == 4){
         writeImage = true;
@@ -57,7 +56,7 @@ int main(int argc, char const *argv[])
             writeImage = false;
         }
 
-        printf("Time in GPU: %.10f\n", cpu_time_used, milliseconds);
+        printf("Time in GPU: %.10f\n", milliseconds);
 
         ofstream outfile(text.c_str(),ios::binary | ios::app);
         outfile << milliseconds << "\n";
