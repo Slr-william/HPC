@@ -121,7 +121,7 @@ int main(int argc, char **argv){
         error = cudaMalloc((void**)&d_imageOutput, sizeGray);
         if(error != cudaSuccess){printf("Error-> memory allocation of d_imageOutput\n");exit(-1);}
 
-        error = cudaMalloc((void**)&d_Mask, sizeof(float)*MASK_WIDTH);
+        error = cudaMalloc((void**)&d_Mask, sizeof(float)*MASK_WIDTH*MASK_WIDTH);
         if(error != cudaSuccess){printf("Error-> h_Mask to d_Mask\n");exit(-1);}
 
         error = cudaMalloc((void**)&d_sobelOutput, sizeGray);
