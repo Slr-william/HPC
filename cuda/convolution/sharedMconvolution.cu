@@ -171,14 +171,14 @@ int main(int argc, char **argv){
         }
 
         //namedWindow(imageName, WINDOW_NORMAL);
-        namedWindow("Gray Image CUDA", WINDOW_NORMAL);
+        //namedWindow("Gray Image CUDA", WINDOW_NORMAL);
         //namedWindow("Sobel Image OpenCV", WINDOW_NORMAL);
 
-        imshow(imageName, image);
-        imshow("Gray Image CUDA", sobel_image);
+        //imshow(imageName, image);
+        //imshow("Gray Image CUDA", sobel_image);
         //imshow("Sobel Image OpenCV", abs_grad_x);
 
-        waitKey(0);
+        //waitKey(0);
 
         //free(h_dataImage);
         //free(h_imageOutput);
