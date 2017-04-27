@@ -25,23 +25,23 @@ __device__ unsigned char setNumber(int value){
 }
 
 
-__global__ void sobelFilter(unsigned char *imageInput, int width, int height, unsigned int maskWidth, char *M, unsigned char *imageOutput){
+__global__ void sobelCuda(unsigned char *imageInput, int width, int height, unsigned int maskWidth, char *M, unsigned char *imageOutput){
     unsigned int row = blockIdx.y*blockDim.y+threadIdx.y;
     unsigned int col = blockIdx.x*blockDim.x+threadIdx.x;
 
-    int Pvalue = 0;
+    int valor = 0;
 
-    int N_start_point_row = row - (maskWidth/2);
-    int N_start_point_col = col - (maskWidth/2);
+    int N_row = row - (maskWidth/2);
+    int N_col = col - (maskWidth/2);
 
     for(int i = 0; i < maskWidth; i++){
         for(int j = 0; j < maskWidth; j++ ){
-            if((N_start_point_col + j >=0 && N_start_point_col + j < width) && (N_start_point_row + i >=0 && N_start_point_row + i < height)){
-                Pvalue += imageInput[(N_start_point_row + i)*width+(N_start_point_col + j)] * M[i*maskWidth+j];
+            if((N_col + j >=0 && N_col + j < width) && (N_row + i >=0 && N_row + i < height)){
+                valor += imageInput[(N_row + i)*width+(N_col + j)] * M[i*maskWidth+j];
             }
         }
     }
-    imageOutput[row*width+col] = setNumber(Pvalue);
+    imageOutput[row*width+col] = setNumber(valor);
 }
 
 __global__ void img2gray(unsigned char *imageInput, int width, int height, unsigned char *imageOutput){
@@ -124,7 +124,7 @@ int main(int argc, char **argv){
         cudaDeviceSynchronize();
 
         cudaEventRecord(startGPU);
-        sobelFilter<<<dimGrid, dimBlock>>>(d_imageOutput, width, height, 3, d_Mask, d_sobelOutput);
+        sobelCuda<<<dimGrid, dimBlock>>>(d_imageOutput, width, height, 3, d_Mask, d_sobelOutput);
         cudaDeviceSynchronize();
         cudaEventRecord(stopGPU);
 
