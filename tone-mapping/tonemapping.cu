@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 
     namedWindow("Image", CV_WINDOW_AUTOSIZE);
     imshow("Image", img);
-    WaitKey(0);
+    waitKey(0);
 
     string text  = string(imageName)+"opencvCudaTimes";
 
