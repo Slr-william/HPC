@@ -80,15 +80,15 @@ int main(int argc, char **argv)
 
         if (writeImage)
         {
-            imwrite("opencvTonemappingInc.jpg", dst);
-            imwrite("opencvTonemappingDec.jpg", dst);
+            imwrite("opencvTonemappingInc.jpg", imgInc);
+            imwrite("opencvTonemappingDec.jpg", imgDec);
             writeImage = false;
         }
 
         imshow("Inc Brightness", imgInc);
         imshow("Dec Brightness", imgDec);
 
-        WaitKey(0);
+        waitKey(0);
 
         //printf("Time in GPU: %.10f\n", milliseconds);
 
