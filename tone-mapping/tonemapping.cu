@@ -4,6 +4,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp> // import no include errors 
+#include <opencv2/photo.hpp>
+#include <opencv2/imgcodecs.hpp>
 //#include <opencv2/gpu/gpu.hpp>
 #include <fstream>
 #include <string>
@@ -14,35 +16,6 @@
 
 using namespace cv;
 using namespace std;
-
-Mat exposureTonemap (Mat m, float gamma = 2.2, float exposure = 1) {
-  // Exposure tone mapping
-  Mat exp;
-  cv::exp( (-m) * exposure, exp );
-  Mat mapped = 1.0f - exp;
-
-  // Gamma correction
-  cv::pow(mapped, 1.0f / gamma, mapped);
-
-  return mapped;
-}
-
-Mat hsvExposureTonemap(Mat &a) {
-  Mat hsvComb;
-  cvtColor(a, hsvComb, COLOR_RGB2HSV);
-
-  Mat hsv[3];
-  split(hsvComb, hsv);
-
-  hsv[2] = exposureTonemap(hsv[2], 2.2, 10);
-
-  merge(hsv, 3, hsvComb);
-
-  Mat rgb;
-  cvtColor(hsvComb, rgb, COLOR_HSV2RGB);
-
-  return rgb;
-}
 
 int main(int argc, char **argv)
 {
@@ -68,7 +41,7 @@ int main(int argc, char **argv)
     namedWindow("Image", CV_WINDOW_AUTOSIZE);
     //imshow("Image", img);
     //waitKey(0);
-    
+
     string text  = string(imageName)+"opencvCudaTimes";
 
     for (int i = 0; i < times; i++){
@@ -78,23 +51,34 @@ int main(int argc, char **argv)
         Mat imgDec;
         img.convertTo(imgDec, -1, 1, -50);  //decrease by 25 units
 
+        Mat imgInc2;
+        img.convertTo(imgInc2, -1, 1, 50);  //decrease by 25 units
+
+        Mat imgDec2;
+        img.convertTo(imgInc2, -1, 1, -50);  //decrease by 25 units
+
         if (writeImage)
         {
             imwrite("opencvTonemappingInc.jpg", imgInc);
+            imwrite("opencvTonemappingInc2.jpg", imgInc2);
             imwrite("opencvTonemappingDec.jpg", imgDec);
+            imwrite("opencvTonemappingDec2.jpg", imgDec2);
             writeImage = false;
         }
 
+        //imshow("Inc Brightness", imgInc);
+        //imshow("Dec Brightness", imgDec);
+
+        //waitKey(0);
         //imshow("Inc", imgInc);
         //imshow("Dec ", imgDec);
 
        // waitKey(0);
-
         //printf("Time in GPU: %.10f\n", milliseconds);
 
         //ofstream outfile(text.c_str(),ios::binary | ios::app);
         //outfile << milliseconds << "\n";
         //outfile.close();
     }
-	return 0;
+  return 0;
 }
