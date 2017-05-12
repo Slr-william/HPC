@@ -66,17 +66,17 @@ int main(int argc, char **argv)
     if (!img.data) exit(1);
 
     namedWindow("Image", CV_WINDOW_AUTOSIZE);
-    imshow("Image", img);
-    waitKey(0);
+    //imshow("Image", img);
+    //waitKey(0);
     
     string text  = string(imageName)+"opencvCudaTimes";
 
     for (int i = 0; i < times; i++){
         Mat imgInc;
-        img.convertTo(imgInc, -1, 1, 25);  //increase by 25 units    
+        img.convertTo(imgInc, -1, 1, 50);  //increase by 25 units    
 
         Mat imgDec;
-        img.convertTo(imgDec, -1, 1, -25);  //decrease by 25 units
+        img.convertTo(imgDec, -1, 1, -50);  //decrease by 25 units
 
         if (writeImage)
         {
@@ -85,10 +85,10 @@ int main(int argc, char **argv)
             writeImage = false;
         }
 
-        imshow("Inc Brightness", imgInc);
-        imshow("Dec Brightness", imgDec);
+        //imshow("Inc", imgInc);
+        //imshow("Dec ", imgDec);
 
-        waitKey(0);
+       // waitKey(0);
 
         //printf("Time in GPU: %.10f\n", milliseconds);
 
