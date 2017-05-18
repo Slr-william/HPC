@@ -11,7 +11,7 @@
 #define GREEN 1
 #define BLUE 0
 #define beta 20
-#define alpha 2
+#define alpha 1
 
 using namespace cv;
 using namespace std;
@@ -21,10 +21,10 @@ __global__ void exposure(unsigned char *imageInput, int width, int height, unsig
     int col = blockIdx.x*blockDim.x+threadIdx.x;
 
     if((row < height) && (col < width)){
-        imageOutput[row*width+col] = 
-        imageInput[(row*width+col)*3+RED]*alpha + beta + 
-        imageInput[(row*width+col)*3+GREEN]*alpha + beta + 
-        imageInput[(row*width+col)*3+BLUE]*alpha + beta;
+         
+        imageOutput[(row*width+col)*3+RED] = imageInput[(row*width+col)*3+RED]*alpha + beta;
+        imageOutput[(row*width+col)*3+GREEN] = imageInput[(row*width+col)*3+GREEN]*alpha + beta;
+        imageOutput[(row*width+col)*3+BLUE] = imageInput[(row*width+col)*3+BLUE]*alpha + beta;
     }
 }
 
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]){
     int height = image.rows;
     int width = image.cols;
     int size = width * height * sizeof(unsigned char)*image.channels();
-    int sizeImage = sizeof(unsigned char)*width*height;
+    int sizeImage = size;
     //clock_t start, end, startGPU, endGPU;
     //double cpu_time_used, gpu_time_used;
     unsigned char *dataRawImage, *d_dataRawImage, *d_imageOutput, *h_imageOutput;
