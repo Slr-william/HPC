@@ -11,6 +11,7 @@
 #define GREEN 1
 #define BLUE 0
 #define beta 20
+#define alpha 2
 
 using namespace cv;
 using namespace std;
@@ -21,9 +22,9 @@ __global__ void exposure(unsigned char *imageInput, int width, int height, unsig
 
     if((row < height) && (col < width)){
         imageOutput[row*width+col] = 
-        imageInput[(row*width+col)*3+RED] + 
-        imageInput[(row*width+col)*3+GREEN] + 
-        imageInput[(row*width+col)*3+BLUE];
+        imageInput[(row*width+col)*3+RED]*alpha + beta + 
+        imageInput[(row*width+col)*3+GREEN]*alpha + beta + 
+        imageInput[(row*width+col)*3+BLUE]*alpha + beta;
     }
 }
 
