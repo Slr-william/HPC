@@ -22,9 +22,9 @@ __global__ void exposure(unsigned char *imageInput, int width, int height, unsig
 
     if((row < height) && (col < width)){
         imageOutput[row*width+col] = 
-        imageInput[(row*width+col)*3+RED]*alpha +beta + 
-        imageInput[(row*width+col)*3+GREEN]*alpha +beta + 
-        imageInput[(row*width+col)*3+BLUE]*alpha +beta;
+        imageInput[(row*width+col)+RED]*alpha +beta + 
+        imageInput[(row*width+col)+GREEN]*alpha +beta + 
+        imageInput[(row*width+col)+BLUE]*alpha +beta;
     }
 }
 
