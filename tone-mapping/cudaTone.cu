@@ -21,8 +21,10 @@ __global__ void exposure(unsigned char *imageInput, int width, int height, unsig
     int col = blockIdx.x*blockDim.x+threadIdx.x;
 
     if((row < height) && (col < width)){
-        imageOutput[row*width+col] = imageInput[(row*width+col)*3+RED]*alpha + beta+ imageInput[(row*width+col)*3+GREEN]*alpha + beta
-        + imageInput[(row*width+col)*3+BLUE]*alpha + beta;
+        imageOutput[row*width+col] = 
+        imageInput[(row*width+col)*3+RED]*alpha +beta + 
+        imageInput[(row*width+col)*3+GREEN]*alpha +beta + 
+        imageInput[(row*width+col)*3+BLUE]*alpha +beta;
     }
 }
 
@@ -69,7 +71,7 @@ int main(int argc, char *argv[]){
     //endGPU = clock();
 
     Mat exposure_image;
-    exposure_image.create(height,width, CV_8UC1);
+    exposure_image.create(height,width, CV_8U);
     exposure_image.data = h_imageOutput;
 
     //start = clock();
