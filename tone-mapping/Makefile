@@ -7,3 +7,6 @@ tonemapping: tonemapping.cu
 
 seqtone: seqtone.cu
 	$(CUDAC) $(CFLAGS) seqtone.cu $(LIBS) -o seqtone.out -O3
+
+cudaTone: cudaTone.cu
+	$(CUDAC) $(CFLAGS) cudaTone.cu $(LIBS) -o cudaTone.out -O3
