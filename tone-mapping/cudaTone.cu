@@ -36,7 +36,7 @@ int main(int argc, char *argv[]){
         name = string(argv[1]);
     }
 
-    Mat image = imread(name, 1);
+    Mat image = imread(name, CV_LOAD_IMAGE_COLOR);
     int height = image.rows;
     int width = image.cols;
     int size = width * height * sizeof(unsigned char)*image.channels();
