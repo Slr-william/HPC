@@ -84,13 +84,15 @@ int main(int argc, char *argv[]){
     //cvtColor(image, exposure_image_opencv, CV_BGR2GRAY);
     //end = clock();
 
+
     imwrite("./exposure_Image.jpg",exposure_image);
+    imshow("imagen",exposure_image);
 
     //namedWindow(name, WINDOW_NORMAL);
     //namedWindow("Gray Image CUDA", WINDOW_NORMAL);
     //namedWindow("Gray Image OpenCV", WINDOW_NORMAL);
 
-    imshow("imagen",exposure_Image);
+    //imshow(name,image);
     //imshow("Gray Image CUDA", exposure_image);
     //imshow("Gray Image OpenCV",exposure_image_opencv);
 
