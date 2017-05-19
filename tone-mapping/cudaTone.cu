@@ -46,7 +46,8 @@ int main(int argc, char *argv[]){
         return -1;
     }
     name = string(argv[1]);
-    float var[] = {atof(argv[2]),atof(argv[3])}; 
+    float var[] = {atof(argv[2]),atof(argv[3])};
+    printf("%f %f\n",var[0], var[1]);
 
     Mat image = imread(name, CV_LOAD_IMAGE_COLOR);
     int height = image.rows;
