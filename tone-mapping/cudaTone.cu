@@ -71,7 +71,7 @@ int main(int argc, char *argv[]){
     //endGPU = clock();
 
     Mat exposure_image;
-    exposure_image.create(height,width, CV_8UC1);
+    exposure_image.create(height,width, CV_RGBA2BGR);
     exposure_image.data = h_imageOutput;
 
     //start = clock();
