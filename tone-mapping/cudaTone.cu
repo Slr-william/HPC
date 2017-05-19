@@ -87,6 +87,7 @@ int main(int argc, char *argv[]){
 
     imwrite("./exposure_Image.jpg",exposure_image);
     imshow("imagen",exposure_image);
+    waitKey(0);
 
     //namedWindow(name, WINDOW_NORMAL);
     //namedWindow("Gray Image CUDA", WINDOW_NORMAL);
