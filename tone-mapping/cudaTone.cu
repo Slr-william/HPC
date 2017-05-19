@@ -14,7 +14,7 @@
 using namespace cv;
 using namespace std;
 
-__constant__ float c_const[1];
+__constant__ float c_const[2];
 
 __global__ void exposure(unsigned char *imageInput, int width, int height, unsigned char *imageOutput){
     int row = blockIdx.y*blockDim.y+threadIdx.y;
