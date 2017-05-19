@@ -37,7 +37,7 @@ int main(int argc, char *argv[]){
         return -1;
     }
     name = string(argv[1]);
-    float var[] = {atoi(argv[2]), atoi(argv[3])}; 
+    float var[] = {(float)atoi(argv[2]),(float)atoi(argv[3])}; 
 
     Mat image = imread(name, CV_LOAD_IMAGE_COLOR);
     int height = image.rows;
