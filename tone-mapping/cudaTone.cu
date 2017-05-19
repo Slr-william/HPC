@@ -90,7 +90,7 @@ int main(int argc, char *argv[]){
     //namedWindow("Gray Image CUDA", WINDOW_NORMAL);
     //namedWindow("Gray Image OpenCV", WINDOW_NORMAL);
 
-    //imshow(name,image);
+    imshow("imagen",exposure_Image);
     //imshow("Gray Image CUDA", exposure_image);
     //imshow("Gray Image OpenCV",exposure_image_opencv);
 
