@@ -14,8 +14,7 @@
 using namespace cv;
 using namespace std;
 
-__constant__ float c_beta;
-__constant__ float c_alpha;
+__constant__ float c_const[1];
 
 __global__ void exposure(unsigned char *imageInput, int width, int height, unsigned char *imageOutput){
     int row = blockIdx.y*blockDim.y+threadIdx.y;
@@ -23,9 +22,9 @@ __global__ void exposure(unsigned char *imageInput, int width, int height, unsig
 
     if((row < height) && (col < width)){
          
-        imageOutput[(row*width+col)*3+RED] = imageInput[(row*width+col)*3+RED]*c_alpha + c_beta;
-        imageOutput[(row*width+col)*3+GREEN] = imageInput[(row*width+col)*3+GREEN]*c_alpha + c_beta;
-        imageOutput[(row*width+col)*3+BLUE] = imageInput[(row*width+col)*3+BLUE]*c_alpha + c_beta;
+        imageOutput[(row*width+col)*3+RED] = imageInput[(row*width+col)*3+RED]*c_const[0] + c_const[1];
+        imageOutput[(row*width+col)*3+GREEN] = imageInput[(row*width+col)*3+GREEN]*c_const[0] + c_const[1];
+        imageOutput[(row*width+col)*3+BLUE] = imageInput[(row*width+col)*3+BLUE]*c_const[0] + c_const[1];
     }
 }
 
@@ -38,8 +37,7 @@ int main(int argc, char *argv[]){
         return -1;
     }
     name = string(argv[1]);
-    float alpha = atoi(argv[2]); 
-    float beta = atoi(argv[3]);
+    float var = {atoi(argv[2]), atoi(argv[3])}; 
 
     Mat image = imread(name, CV_LOAD_IMAGE_COLOR);
     int height = image.rows;
@@ -59,8 +57,7 @@ int main(int argc, char *argv[]){
     h_imageOutput = (unsigned char *)malloc(sizeImage);
     cudaMalloc((void**)&d_imageOutput,sizeImage);
 
-    cudaMemcpyToSymbol(c_alpha, alpha, sizeof(float));
-    cudaMemcpyToSymbol(c_beta, beta, sizeof(float));
+    cudaMemcpyToSymbol(c_const, var, 2*sizeof(float));
 
     dataRawImage = image.data;
 
