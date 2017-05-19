@@ -23,9 +23,9 @@ __global__ void exposure(unsigned char *imageInput, int width, int height, unsig
 
     if((row < height) && (col < width)){
          
-        imageOutput[(row*width+col)*3+RED] = imageInput[(row*width+col)*3+RED]*alpha + beta;
-        imageOutput[(row*width+col)*3+GREEN] = imageInput[(row*width+col)*3+GREEN]*alpha + beta;
-        imageOutput[(row*width+col)*3+BLUE] = imageInput[(row*width+col)*3+BLUE]*alpha + beta;
+        imageOutput[(row*width+col)*3+RED] = imageInput[(row*width+col)*3+RED]*c_alpha + c_beta;
+        imageOutput[(row*width+col)*3+GREEN] = imageInput[(row*width+col)*3+GREEN]*c_alpha + c_beta;
+        imageOutput[(row*width+col)*3+BLUE] = imageInput[(row*width+col)*3+BLUE]*c_alpha + c_beta;
     }
 }
 
@@ -38,16 +38,14 @@ int main(int argc, char *argv[]){
         return -1;
     }
     name = string(argv[1]);
-    float alpha = atoi(arg[2]); 
-    float beta = atoi(arg[3]);
+    float alpha = atoi(argv[2]); 
+    float beta = atoi(argv[3]);
 
     Mat image = imread(name, CV_LOAD_IMAGE_COLOR);
     int height = image.rows;
     int width = image.cols;
     int size = width * height * sizeof(unsigned char)*image.channels();
     int sizeImage = size;
-
-    cv::cvtColor(image, imageRGBA, CV_BGR2RGBA);
     //clock_t start, end, startGPU, endGPU;
     //double cpu_time_used, gpu_time_used;
     unsigned char *dataRawImage, *d_dataRawImage, *d_imageOutput, *h_imageOutput;
@@ -81,7 +79,7 @@ int main(int argc, char *argv[]){
     //endGPU = clock();
 
     Mat exposure_image;
-    exposure_image.create(height,width, CV_8CU3);
+    exposure_image.create(height,width, CV_8UC3);
     exposure_image.data = h_imageOutput;
 
     //start = clock();
