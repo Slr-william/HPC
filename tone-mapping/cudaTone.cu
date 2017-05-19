@@ -16,15 +16,24 @@ using namespace std;
 
 __constant__ float c_const[2];
 
+__device__ unsigned char setNumber(int value){
+    if(value < 0)
+        value = 0;
+    else
+        if(value > 255)
+            value = 255;
+    return (unsigned char)value;
+}
+
 __global__ void exposure(unsigned char *imageInput, int width, int height, unsigned char *imageOutput){
     int row = blockIdx.y*blockDim.y+threadIdx.y;
     int col = blockIdx.x*blockDim.x+threadIdx.x;
 
     if((row < height) && (col < width)){
          
-        imageOutput[(row*width+col)*3+RED] = imageInput[(row*width+col)*3+RED]*c_const[0] + c_const[1];
-        imageOutput[(row*width+col)*3+GREEN] = imageInput[(row*width+col)*3+GREEN]*c_const[0] + c_const[1];
-        imageOutput[(row*width+col)*3+BLUE] = imageInput[(row*width+col)*3+BLUE]*c_const[0] + c_const[1];
+        imageOutput[(row*width+col)*3+RED] = setnumber(imageInput[(row*width+col)*3+RED]*c_const[0] + c_const[1]);
+        imageOutput[(row*width+col)*3+GREEN] = setnumber(imageInput[(row*width+col)*3+GREEN]*c_const[0] + c_const[1]);
+        imageOutput[(row*width+col)*3+BLUE] = setnumber(imageInput[(row*width+col)*3+BLUE]*c_const[0] + c_const[1]);
     }
 }
 
