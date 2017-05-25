@@ -44,16 +44,16 @@ int main(int argc, char **argv)
 
     for (int i = 0; i < times; i++){
         Mat imgInc;
-        img.convertTo(imgInc, -1, 1, 50);  //increase by 25 units    
+        img.convertTo(imgInc, -1, 1, 25);  //increase by 25 units    
 
         Mat imgDec;
-        img.convertTo(imgDec, -1, 1, -50);  //decrease by 25 units
+        img.convertTo(imgDec, -1, 1, -25);  //decrease by 25 units
 
         Mat imgInc2;
         img.convertTo(imgInc2, -1, 1, 50);  //decrease by 25 units
 
         Mat imgDec2;
-        img.convertTo(imgInc2, -1, 1, -50);  //decrease by 25 units
+        img.convertTo(imgDec2, -1, 1, -10);  //decrease by 25 units
 
         if (writeImage)
         {
