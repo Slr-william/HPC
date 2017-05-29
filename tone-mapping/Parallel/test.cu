@@ -118,7 +118,7 @@ int main(int argc, char** argv)
 	Size imageSize;
 	int width, height, channels, sizeImage;
 	float q=0.0, k=0.0;
-	int show_flag;
+	int show_flag, N;
 	int *d_mutex;
 //	std::vector<Mat>images;
 
