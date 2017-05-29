@@ -14,7 +14,9 @@
 using namespace cv;
 
 
-__device__ float maxLum;
+__device__ float maxLum = 0;
+__device__ float pLum = 0;
+__device__ float lum = 0;
 
 std::string type2str(int type) {
 	std::string r;
@@ -55,8 +57,6 @@ __device__ float logarithmic_mapping(float k, float q, float val_pixel)
 __device__ float findLum(float * imageInput, int width, int height){
 	int row = blockIdx.y*blockDim.y+threadIdx.y;
     int col = blockIdx.x*blockDim.x+threadIdx.x;
-    float pLum = 0;
-    float lum = 0;
 
     if((row < height) && (col < width)){
         lum = imageInput[(row*width+col)*3+RED]*0.299 + imageInput[(row*width+col)*3+GREEN]*0.587 + imageInput[(row*width+col)*3+BLUE]*0.114;
