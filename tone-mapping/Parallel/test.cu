@@ -47,20 +47,16 @@ void checkError(cudaError_t err) {
 }
 
 
-__device__ float logarithmic_mapping(float k, float q, float val_pixel)
-{
+__device__ float logarithmic_mapping(float k, float q, float val_pixel){
 	return (log10(1 + q * val_pixel))/(log10(1 + k * maxLum));
 }
 
-__global__ void find_maximum_kernel(float *array, int *mutex, unsigned int n, int blockSize)
-{
+__global__ void find_maximum_kernel(float *array, int *mutex, unsigned int n, int blockSize){
 	unsigned int index = threadIdx.x + blockIdx.x*blockDim.x;
 	unsigned int stride = gridDim.x*blockDim.x;
 	unsigned int offset = 0;
-//	const int size = blockSize;
 
 	extern	__shared__ float cache[];
-
 
 	float temp = -1.0;
 	while(index + offset < n){
@@ -72,8 +68,6 @@ __global__ void find_maximum_kernel(float *array, int *mutex, unsigned int n, in
 	cache[threadIdx.x] = temp;
 
 	__syncthreads();
-
-
 	// reduction
 	unsigned int i = blockDim.x/2;
 	while(i != 0){
@@ -92,8 +86,7 @@ __global__ void find_maximum_kernel(float *array, int *mutex, unsigned int n, in
 	}
 }
 
-__global__ void tonemap(float* imageIn, float* imageOut, int width, int height, int channels, int depth, float q, float k)
-{	
+__global__ void tonemap_logarithmic(float* imageIn, float* imageOut, int width, int height, int channels, int depth, float q, float k){	
 	//printf("maxLum : %f\n", maxLum);
 	int Row = blockDim.y * blockIdx.y + threadIdx.y;
 	int Col = blockDim.x * blockIdx.x + threadIdx.x;
@@ -110,11 +103,29 @@ __global__ void tonemap(float* imageIn, float* imageOut, int width, int height, 
 	imshow(window, image);
  }
 
-int main(int argc, char** argv)
+__device__ float gamma_correction(float f_stop, float gamma, float val)
 {
+	return powf((val*powf(2,f_stop)),(1.0/gamma));
+}
+
+__global__ void tonemap_gamma(float* imageIn, float* imageOut, int width, int height, int channels, int depth, float f_stop,
+						float gamma)
+{
+	int Row = blockDim.y * blockIdx.y + threadIdx.y;
+	int Col = blockDim.x * blockIdx.x + threadIdx.x;
+
+	if(Row < height && Col < width) {
+		imageOut[(Row*width+Col)*3+BLUE] = gamma_correction(f_stop, gamma, imageIn[(Row*width+Col)*3+BLUE]);
+		imageOut[(Row*width+Col)*3+GREEN] = gamma_correction(f_stop, gamma, imageIn[(Row*width+Col)*3+GREEN]);
+		imageOut[(Row*width+Col)*3+RED] = gamma_correction(f_stop, gamma, imageIn[(Row*width+Col)*3+RED]);
+	}
+}
+
+int main(int argc, char** argv){
 	char* image_name = argv[1];
     char* image_out_name = argv[5];
 	float *h_ImageData, *d_ImageData, *d_ImageOut, *h_ImageOut;
+	char option;
 	Mat hdr, ldr;
 	Size imageSize;
 	int width, height, channels, sizeImage;
@@ -125,15 +136,16 @@ int main(int argc, char** argv)
 
 //	printf("%s\n", image_name);
 	hdr = imread(image_name, -1);
-	if(argc !=6 || !hdr.data) {
+	if(argc !=7 || !hdr.data) {
 		printf("No image Data \n");
-		printf("Usage: ./test <file_path> <q> <k> <show_flag> <output_file_path>");
+		printf("Usage: ./test <file_path> <q|f-stop> <k|gamma> <show_flag> <output_file_path> [L|G]");
 		return -1;
 	}
 
 	q = atof(argv[2]);
 	k = atof(argv[3]);
 	show_flag = atoi(argv[4]);
+	option = argv[7];
 
 	if(hdr.empty()) {
 		printf("Couldn't find or open the image...\n");
@@ -170,11 +182,30 @@ int main(int argc, char** argv)
 	int blockSize = 32;	
 	dim3 dimBlock(blockSize, blockSize, 1);
 	dim3 dimGrid(ceil(width/float(blockSize)), ceil(height/float(blockSize)), 1);
-	cudaEventRecord(start);
-	find_maximum_kernel<<< dimGrid, dimBlock, sizeof(float)*blockSize >>>(d_ImageData, d_mutex, N, blockSize);
-	cudaDeviceSynchronize();
-	tonemap<<<dimGrid, dimBlock>>>(d_ImageData, d_ImageOut, width, height, channels, 32, q, k);
-	cudaEventRecord(stop);
+	switch(option){
+		case "l":
+		case "L": {
+			cudaEventRecord(start);
+			find_maximum_kernel<<< dimGrid, dimBlock, sizeof(float)*blockSize >>>(d_ImageData, d_mutex, N, blockSize);
+			cudaDeviceSynchronize();
+			tonemap_logarithmic<<<dimGrid, dimBlock>>>(d_ImageData, d_ImageOut, width, height, channels, 32, q, k);
+			cudaEventRecord(stop);
+			break;
+		}
+		case "g":
+		case "G": {
+			cudaEventRecord(start);
+			tonemap_gamma<<<dimGrid, dimBlock>>>(d_ImageData, d_ImageOut, width, height, channels, 32, q, k);
+			cudaEventRecord(stop);
+			break;
+		}
+		default:{
+			printf("Wrong choice\n");
+			return -1;
+		}
+
+	}
+
 	cudaDeviceSynchronize();
 	cudaEventElapsedTime(&milliseconds, start, stop);
 	printf("%s|%.10f\n", image_name, milliseconds/1000.0);
