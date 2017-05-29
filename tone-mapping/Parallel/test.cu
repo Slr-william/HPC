@@ -69,7 +69,7 @@ __global__ void findLum(float * imageInput, int width, int height){
     __syncthreads();
 
     maxLum = pLum;
-    printf("Hello from findLum %f\n", maxLum);
+    //printf("Hello from findLum %f\n", maxLum);
 
 }
 
