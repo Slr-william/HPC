@@ -202,6 +202,7 @@ int main(int argc, char** argv){
 			break;
 
 		default:
+			free(h_ImageOut); cudaFree(d_ImageData); cudaFree(d_ImageOut); cudaFree(d_mutex);
 			printf("Wrong choice\n");
 			return -1;
 	}
