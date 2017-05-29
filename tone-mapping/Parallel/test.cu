@@ -185,6 +185,7 @@ int main(int argc, char** argv){
 	switch(option){
 		case "l":
 		case "L": {
+			printf("Logarithmic_mapping\n");
 			cudaEventRecord(start);
 			find_maximum_kernel<<< dimGrid, dimBlock, sizeof(float)*blockSize >>>(d_ImageData, d_mutex, N, blockSize);
 			cudaDeviceSynchronize();
@@ -194,6 +195,7 @@ int main(int argc, char** argv){
 		}
 		case "g":
 		case "G": {
+			printf("Gamma_correction\n");
 			cudaEventRecord(start);
 			tonemap_gamma<<<dimGrid, dimBlock>>>(d_ImageData, d_ImageOut, width, height, channels, 32, q, k);
 			cudaEventRecord(stop);
