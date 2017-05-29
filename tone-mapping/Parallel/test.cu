@@ -145,7 +145,7 @@ int main(int argc, char** argv){
 	q = atof(argv[2]);
 	k = atof(argv[3]);
 	show_flag = atoi(argv[4]);
-	option = argv[7];
+	option = argv[6];
 
 	if(hdr.empty()) {
 		printf("Couldn't find or open the image...\n");
@@ -162,7 +162,7 @@ int main(int argc, char** argv){
 	std::string ty =  type2str( hdr.type() );
 //	printf("Image: %s %dx%d \n", ty.c_str(), hdr.cols, hdr.rows );
 
-	//printf("Channels: %d\nDepth: %d\n", hdr.channels(), hdr.depth());
+	printf("Channels: %d\nDepth: %d\n", hdr.channels(), hdr.depth());
 
 	h_ImageData = (float *) malloc (sizeImage);
 	h_ImageData = (float *)hdr.data;
