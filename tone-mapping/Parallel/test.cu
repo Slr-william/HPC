@@ -125,7 +125,7 @@ int main(int argc, char** argv){
 	char* image_name = argv[1];
     char* image_out_name = argv[5];
 	float *h_ImageData, *d_ImageData, *d_ImageOut, *h_ImageOut;
-	char option;
+	char * option;
 	Mat hdr, ldr;
 	Size imageSize;
 	int width, height, channels, sizeImage;
@@ -145,7 +145,7 @@ int main(int argc, char** argv){
 	q = atof(argv[2]);
 	k = atof(argv[3]);
 	show_flag = atoi(argv[4]);
-	option = argv[7][0];
+	option = argv[7];
 
 	if(hdr.empty()) {
 		printf("Couldn't find or open the image...\n");
@@ -182,7 +182,7 @@ int main(int argc, char** argv){
 	int blockSize = 32;	
 	dim3 dimBlock(blockSize, blockSize, 1);
 	dim3 dimGrid(ceil(width/float(blockSize)), ceil(height/float(blockSize)), 1);
-	switch(option){
+	switch(option[0]){
 		case 'l':
 		case 'L':
 			printf("Logarithmic_mapping\n");
