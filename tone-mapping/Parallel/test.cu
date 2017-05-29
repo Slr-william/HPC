@@ -47,9 +47,9 @@ void checkError(cudaError_t err) {
 }
 
 
-__device__ float logarithmic_mapping(float k, float q, float val_pixel, float lum_escena)
+__device__ float logarithmic_mapping(float k, float q, float val_pixel)
 {
-	return (log10(1 + q * val_pixel))/(log10(1 + k * lum_escena));
+	return (log10(1 + q * val_pixel))/(log10(1 + k * maxLum));
 }
 
 __device__ float findLum(float * imageInput, int width, int height){
@@ -78,9 +78,9 @@ __global__ void tonemap(float* imageIn, float* imageOut, int width, int height, 
 	int Col = blockDim.x * blockIdx.x + threadIdx.x;
 
 	if(Row < height && Col < width) {
-		imageOut[(Row*width+Col)*3+BLUE] = logarithmic_mapping(k, q, imageIn[(Row*width+Col)*3+BLUE], maxLum);
-		imageOut[(Row*width+Col)*3+GREEN] = logarithmic_mapping(k, q, imageIn[(Row*width+Col)*3+GREEN], maxLum);
-		imageOut[(Row*width+Col)*3+RED] = logarithmic_mapping(k, q, imageIn[(Row*width+Col)*3+RED], maxLum);
+		imageOut[(Row*width+Col)*3+BLUE] = logarithmic_mapping(k, q, imageIn[(Row*width+Col)*3+BLUE]);
+		imageOut[(Row*width+Col)*3+GREEN] = logarithmic_mapping(k, q, imageIn[(Row*width+Col)*3+GREEN]);
+		imageOut[(Row*width+Col)*3+RED] = logarithmic_mapping(k, q, imageIn[(Row*width+Col)*3+RED]);
 	}
 }
 
@@ -146,6 +146,7 @@ int main(int argc, char** argv)
 	dim3 dimGrid(ceil(width/float(blockSize)), ceil(height/float(blockSize)), 1);
 	cudaEventRecord(start);
 	findLum<<<dimGrid, dimBlock>>>(d_ImageData, width, height);
+	cudaDeviceSynchronize();
 	tonemap<<<dimGrid, dimBlock>>>(d_ImageData, d_ImageOut, width, height, channels, 32, q, k);
 	cudaEventRecord(stop);
 	cudaDeviceSynchronize();
