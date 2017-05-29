@@ -15,8 +15,6 @@ using namespace cv;
 
 
 __device__ float maxLum;
-__device__ float lum;
-__device__ float lumEscena;
 
 std::string type2str(int type) {
 	std::string r;
@@ -57,32 +55,32 @@ __device__ float logarithmic_mapping(float k, float q, float val_pixel, float lu
 __device__ float findLum(float * imageInput, int width, int height){
 	int row = blockIdx.y*blockDim.y+threadIdx.y;
     int col = blockIdx.x*blockDim.x+threadIdx.x;
-    maxLum = 0;
-    lum = 0;
+    float pLum = 0;
+    float lum = 0;
 
     if((row < height) && (col < width)){
         lum = imageInput[(row*width+col)*3+RED]*0.299 + imageInput[(row*width+col)*3+GREEN]*0.587 + imageInput[(row*width+col)*3+BLUE]*0.114;
-        if (lum > maxLum)
+        if (lum > pLum)
         {
-        	maxLum = lum;
+        	pLum = lum;
         }
     }
 
     __syncthreads();
 
-    return maxLum;
+    maxLum = pLum;
+
 }
 
 __global__ void tonemap(float* imageIn, float* imageOut, int width, int height, int channels, int depth, float q, float k)
 {	
-	lumEscena = findLum(imageIn,width,height);
 	int Row = blockDim.y * blockIdx.y + threadIdx.y;
 	int Col = blockDim.x * blockIdx.x + threadIdx.x;
 
 	if(Row < height && Col < width) {
-		imageOut[(Row*width+Col)*3+BLUE] = logarithmic_mapping(k, q, imageIn[(Row*width+Col)*3+BLUE], lumEscena);
-		imageOut[(Row*width+Col)*3+GREEN] = logarithmic_mapping(k, q, imageIn[(Row*width+Col)*3+GREEN], lumEscena);
-		imageOut[(Row*width+Col)*3+RED] = logarithmic_mapping(k, q, imageIn[(Row*width+Col)*3+RED], lumEscena);
+		imageOut[(Row*width+Col)*3+BLUE] = logarithmic_mapping(k, q, imageIn[(Row*width+Col)*3+BLUE], maxLum);
+		imageOut[(Row*width+Col)*3+GREEN] = logarithmic_mapping(k, q, imageIn[(Row*width+Col)*3+GREEN], maxLum);
+		imageOut[(Row*width+Col)*3+RED] = logarithmic_mapping(k, q, imageIn[(Row*width+Col)*3+RED], maxLum);
 	}
 }
 
@@ -147,6 +145,7 @@ int main(int argc, char** argv)
 	dim3 dimBlock(blockSize, blockSize, 1);
 	dim3 dimGrid(ceil(width/float(blockSize)), ceil(height/float(blockSize)), 1);
 	cudaEventRecord(start);
+	findLum<<<dimGrid, dimBlock>>>(d_ImageData, width, height);
 	tonemap<<<dimGrid, dimBlock>>>(d_ImageData, d_ImageOut, width, height, channels, 32, q, k);
 	cudaEventRecord(stop);
 	cudaDeviceSynchronize();
