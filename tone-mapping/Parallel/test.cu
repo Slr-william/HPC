@@ -53,13 +53,13 @@ __device__ float findLum(unsigned char *imageInput, int width, int height){
 	int row = blockIdx.y*blockDim.y+threadIdx.y;
     int col = blockIdx.x*blockDim.x+threadIdx.x;
     float maxLum = 0;
-    float lum = 0;
+    unsigned char lum = 0;
 
     if((row < height) && (col < width)){
         lum = imageInput[(row*width+col)*3+RED]*0.299 + imageInput[(row*width+col)*3+GREEN]*0.587 + imageInput[(row*width+col)*3+BLUE]*0.114;
         if (lum > maxLum)
         {
-        	maxLum = lum;
+        	maxLum = (float)lum;
         }
     }
 
