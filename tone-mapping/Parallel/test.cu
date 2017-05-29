@@ -54,7 +54,7 @@ __device__ float logarithmic_mapping(float k, float q, float val_pixel)
 	return (log10(1 + q * val_pixel))/(log10(1 + k * maxLum));
 }
 
-__device__ void findLum(float * imageInput, int width, int height){
+__global__ void findLum(float * imageInput, int width, int height){
 	int row = blockIdx.y*blockDim.y+threadIdx.y;
     int col = blockIdx.x*blockDim.x+threadIdx.x;
 
