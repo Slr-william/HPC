@@ -205,7 +205,6 @@ int main(int argc, char** argv){
 			printf("Wrong choice\n");
 			return -1;
 		}
-
 	}
 
 	cudaDeviceSynchronize();
