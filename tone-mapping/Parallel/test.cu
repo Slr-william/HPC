@@ -94,7 +94,7 @@ __global__ void find_maximum_kernel(float *array, int *mutex, unsigned int n, in
 
 __global__ void tonemap(float* imageIn, float* imageOut, int width, int height, int channels, int depth, float q, float k)
 {	
-	printf("maxLum : %f\n", maxLum);
+	//printf("maxLum : %f\n", maxLum);
 	int Row = blockDim.y * blockIdx.y + threadIdx.y;
 	int Col = blockDim.x * blockIdx.x + threadIdx.x;
 
