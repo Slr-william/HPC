@@ -68,7 +68,7 @@ __device__ float findLum(float * imageInput, int width, int height){
         }
     }
 
-    cudaDeviceSynchronize();
+    __syncthreads();
 
     return maxLum;
 }
