@@ -16,7 +16,7 @@ using namespace cv;
 
 __device__ float maxLum;
 __device__ float lum;
-__device__ float maxLum;
+__device__ float lumEscena;
 
 std::string type2str(int type) {
 	std::string r;
@@ -77,7 +77,7 @@ __global__ void tonemap(float* imageIn, float* imageOut, int width, int height, 
 {
 	int Row = blockDim.y * blockIdx.y + threadIdx.y;
 	int Col = blockDim.x * blockIdx.x + threadIdx.x;
-	maxLum = findLum(imageIn,width,height);
+	lumEscena = findLum(imageIn,width,height);
 
 	if(Row < height && Col < width) {
 		imageOut[(Row*width+Col)*3+BLUE] = logarithmic_mapping(k, q, imageIn[(Row*width+Col)*3+BLUE], maxLum);
