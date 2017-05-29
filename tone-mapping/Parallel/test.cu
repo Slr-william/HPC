@@ -15,8 +15,6 @@ using namespace cv;
 
 
 __device__ float maxLum = 0;
-__device__ float pLum = 0;
-__device__ float lum = 0;
 
 std::string type2str(int type) {
 	std::string r;
@@ -54,23 +52,44 @@ __device__ float logarithmic_mapping(float k, float q, float val_pixel)
 	return (log10(1 + q * val_pixel))/(log10(1 + k * maxLum));
 }
 
-__global__ void findLum(float * imageInput, int width, int height){
-	int row = blockIdx.y*blockDim.y+threadIdx.y;
-    int col = blockIdx.x*blockDim.x+threadIdx.x;
+__global__ void find_maximum_kernel(float *array, int *mutex, unsigned int n, int blockSize)
+{
+	unsigned int index = threadIdx.x + blockIdx.x*blockDim.x;
+	unsigned int stride = gridDim.x*blockDim.x;
+	unsigned int offset = 0;
+//	const int size = blockSize;
 
-    if((row < height) && (col < width)){
-        lum = imageInput[(row*width+col)*3+RED]*0.299 + imageInput[(row*width+col)*3+GREEN]*0.587 + imageInput[(row*width+col)*3+BLUE]*0.114;
-        if (lum > pLum)
-        {
-        	pLum = lum;
-        }
-    }
+	extern	__shared__ float cache[];
 
-    __syncthreads();
 
-    maxLum = pLum;
-    //printf("Hello from findLum %f\n", maxLum);
+	float temp = -1.0;
+	while(index + offset < n){
+		temp = fmaxf(temp, array[index + offset]);
 
+		offset += stride;
+	}
+
+	cache[threadIdx.x] = temp;
+
+	__syncthreads();
+
+
+	// reduction
+	unsigned int i = blockDim.x/2;
+	while(i != 0){
+		if(threadIdx.x < i){
+			cache[threadIdx.x] = fmaxf(cache[threadIdx.x], cache[threadIdx.x + i]);
+		}
+
+		__syncthreads();
+		i /= 2;
+	}
+
+	if(threadIdx.x == 0){
+		while(atomicCAS(mutex,0,1) != 0);  //lock
+		maxLum = fmaxf(maxLum, cache[0]);
+		atomicExch(mutex, 0);  //unlock
+	}
 }
 
 __global__ void tonemap(float* imageIn, float* imageOut, int width, int height, int channels, int depth, float q, float k)
@@ -100,6 +119,7 @@ int main(int argc, char** argv)
 	int width, height, channels, sizeImage;
 	float q=0.0, k=0.0;
 	int show_flag;
+	int *d_mutex;
 //	std::vector<Mat>images;
 
 //	printf("%s\n", image_name);
@@ -122,6 +142,7 @@ int main(int argc, char** argv)
 	width = imageSize.width;
 	height = imageSize.height;
 	channels = hdr.channels();
+	N = width*height*channels;
 	sizeImage = sizeof(float)*width*height*channels;
 
 	//printf("Width: %d\nHeight: %d\n", width, height);
@@ -138,15 +159,18 @@ int main(int argc, char** argv)
 	cudaEventCreate(&stop);
 	float milliseconds = 0;
 
+	checkError(cudaMalloc((void**)&d_mutex, sizeof(int)));
 	checkError(cudaMalloc((void **)&d_ImageData, sizeImage));
 	checkError(cudaMalloc((void **)&d_ImageOut, sizeImage));
 	checkError(cudaMemcpy(d_ImageData, h_ImageData, sizeImage, cudaMemcpyHostToDevice));
 
-	int blockSize = 32;
+	cudaMemset(d_mutex, 0, sizeof(int));
+
+	int blockSize = 32;	
 	dim3 dimBlock(blockSize, blockSize, 1);
 	dim3 dimGrid(ceil(width/float(blockSize)), ceil(height/float(blockSize)), 1);
 	cudaEventRecord(start);
-	findLum<<<dimGrid, dimBlock>>>(d_ImageData, width, height);
+	find_maximum_kernel<<< dimGrid, dimBlock, sizeof(float)*blockSize >>>(d_ImageData, d_mutex, N, blockSize);
 	cudaDeviceSynchronize();
 	tonemap<<<dimGrid, dimBlock>>>(d_ImageData, d_ImageOut, width, height, channels, 32, q, k);
 	cudaEventRecord(stop);
@@ -169,7 +193,7 @@ int main(int argc, char** argv)
 		waitKey(0);
 	}
 
-	free(h_ImageOut); cudaFree(d_ImageData); cudaFree(d_ImageOut);
+	free(h_ImageOut); cudaFree(d_ImageData); cudaFree(d_ImageOut); cudaFree(d_mutex);
 
 	return 0;
 }
