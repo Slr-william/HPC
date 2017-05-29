@@ -74,10 +74,11 @@ __device__ float findLum(float * imageInput, int width, int height){
 }
 
 __global__ void tonemap(float* imageIn, float* imageOut, int width, int height, int channels, int depth, float q, float k)
-{
+{	
+	lumEscena = findLum(imageIn,width,height);
+	
 	int Row = blockDim.y * blockIdx.y + threadIdx.y;
 	int Col = blockDim.x * blockIdx.x + threadIdx.x;
-	lumEscena = findLum(imageIn,width,height);
 
 	if(Row < height && Col < width) {
 		imageOut[(Row*width+Col)*3+BLUE] = logarithmic_mapping(k, q, imageIn[(Row*width+Col)*3+BLUE], maxLum);
