@@ -69,6 +69,7 @@ __device__ float findLum(float * imageInput, int width, int height){
     __syncthreads();
 
     maxLum = pLum;
+    printf("Hello from findLum %f\n", maxLum);
 
 }
 
