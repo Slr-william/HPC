@@ -125,7 +125,7 @@ int main(int argc, char** argv){
 	char* image_name = argv[1];
     char* image_out_name = argv[5];
 	float *h_ImageData, *d_ImageData, *d_ImageOut, *h_ImageOut;
-	char option;
+	char* option;
 	Mat hdr, ldr;
 	Size imageSize;
 	int width, height, channels, sizeImage;
