@@ -183,8 +183,9 @@ int main(int argc, char** argv){
 	dim3 dimBlock(blockSize, blockSize, 1);
 	dim3 dimGrid(ceil(width/float(blockSize)), ceil(height/float(blockSize)), 1);
 	switch(option){
+		
 		case "l":
-		case "L": {
+		case "L":
 			printf("Logarithmic_mapping\n");
 			cudaEventRecord(start);
 			find_maximum_kernel<<< dimGrid, dimBlock, sizeof(float)*blockSize >>>(d_ImageData, d_mutex, N, blockSize);
@@ -192,19 +193,18 @@ int main(int argc, char** argv){
 			tonemap_logarithmic<<<dimGrid, dimBlock>>>(d_ImageData, d_ImageOut, width, height, channels, 32, q, k);
 			cudaEventRecord(stop);
 			break;
-		}
+
 		case "g":
-		case "G": {
+		case "G": 
 			printf("Gamma_correction\n");
 			cudaEventRecord(start);
 			tonemap_gamma<<<dimGrid, dimBlock>>>(d_ImageData, d_ImageOut, width, height, channels, 32, q, k);
 			cudaEventRecord(stop);
 			break;
-		}
-		default:{
+
+		default:
 			printf("Wrong choice\n");
 			return -1;
-		}
 	}
 
 	cudaDeviceSynchronize();
