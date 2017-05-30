@@ -13,7 +13,7 @@ def gamma_correction(value, gamma, f_stop):
 # Load and parse the data
 sc = SparkContext(appName="Kmeans")
 #data = sc.textFile("kmeans_data.txt")
-data = cv2.imread('../imagesHDR/.exr', -1)
+data = cv2.imread('../imagesHDR/ennis_latlong.exr', -1)
 test_data = data.reshape(data.shape[0] * data.shape[1], 3)
 #parsedData = data.map(lambda line: array([float(x) for x in line.split(' ')]))
 #result = np.array(ldr, dtype=np.float32).reshape(data.shape[0], data.shape[1], 3)
