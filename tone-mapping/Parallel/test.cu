@@ -153,7 +153,7 @@ int main(int argc, char** argv){
 	hdr = imread(image_name, -1);
 	if(argc !=7 || !hdr.data) {
 		printf("No image Data \n");
-		printf("Usage: ./test <file_path> <q|f-stop> <k|gamma> <show_flag> <output_file_path> [L|G]\n");
+		printf("Usage: ./test <file_path> <q|f-stop|b> <k|gamma|Lscreen> <show_flag> <output_file_path> [L|G]\n");
 		return -1;
 	}
 
