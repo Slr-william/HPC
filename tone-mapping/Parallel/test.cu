@@ -51,6 +51,9 @@ __device__ float logarithmic_mapping(float k, float q, float val_pixel){
 	return (log10(1 + q * val_pixel))/(log10(1 + k * maxLum));
 }
 
+__device__ float adaptive_mapping(float k, float q, float val_pixel){
+	return 	(255*log(1 + val_pixel))/((100*log10(1 + maxLum)) * ( powf((log(2+8*(val_pixel/maxLum))), (log(0.6)/log(0.5)) ) )	);
+}
 __global__ void find_maximum_kernel(float *array, int *mutex, unsigned int n, int blockSize){
 	unsigned int index = threadIdx.x + blockIdx.x*blockDim.x;
 	unsigned int stride = gridDim.x*blockDim.x;
@@ -83,6 +86,18 @@ __global__ void find_maximum_kernel(float *array, int *mutex, unsigned int n, in
 		while(atomicCAS(mutex,0,1) != 0);  //lock
 		maxLum = fmaxf(maxLum, cache[0]);
 		atomicExch(mutex, 0);  //unlock
+	}
+}
+
+__global__ void tonemap_adaptive(float* imageIn, float* imageOut, int width, int height, int channels, int depth, float q, float k){	
+	//printf("maxLum : %f\n", maxLum);
+	int Row = blockDim.y * blockIdx.y + threadIdx.y;
+	int Col = blockDim.x * blockIdx.x + threadIdx.x;
+
+	if(Row < height && Col < width) {
+		imageOut[(Row*width+Col)*3+BLUE] = adaptive_mapping(k, q, imageIn[(Row*width+Col)*3+BLUE]);
+		imageOut[(Row*width+Col)*3+GREEN] = adaptive_mapping(k, q, imageIn[(Row*width+Col)*3+GREEN]);
+		imageOut[(Row*width+Col)*3+RED] = adaptive_mapping(k, q, imageIn[(Row*width+Col)*3+RED]);
 	}
 }
 
@@ -183,6 +198,15 @@ int main(int argc, char** argv){
 	dim3 dimBlock(blockSize, blockSize, 1);
 	dim3 dimGrid(ceil(width/float(blockSize)), ceil(height/float(blockSize)), 1);
 	switch(option[0]){
+		case 'a':
+		case 'A':
+			printf("Adaptive logarithmic mapping\n");
+			cudaEventRecord(start);
+			find_maximum_kernel<<< dimGrid, dimBlock, sizeof(float)*blockSize >>>(d_ImageData, d_mutex, N, blockSize);
+			cudaDeviceSynchronize();
+			tonemap_adaptive<<<dimGrid, dimBlock>>>(d_ImageData, d_ImageOut, width, height, channels, 32, q, k);
+			cudaEventRecord(stop);
+			break;
 		case 'l':
 		case 'L':
 			printf("Logarithmic_mapping\n");
