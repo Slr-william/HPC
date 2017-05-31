@@ -52,7 +52,7 @@ __device__ float logarithmic_mapping(float k, float q, float val_pixel){
 }
 
 __device__ float adaptive_mapping(float k, float q, float val_pixel){
-	return 	(255*log(1 + val_pixel))/((100*log10(1 + maxLum)) * ( powf((log(2+8*(val_pixel/maxLum))), (log(0.6)/log(0.5)) ) )	);
+	return 	(k*log(1 + val_pixel))/((100*log10(1 + maxLum)) * ( powf((log(2+8*(val_pixel/maxLum))), (log(q)/log(0.5)) ) )	);
 }
 __global__ void find_maximum_kernel(float *array, int *mutex, unsigned int n, int blockSize){
 	unsigned int index = threadIdx.x + blockIdx.x*blockDim.x;
