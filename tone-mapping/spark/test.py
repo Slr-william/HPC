@@ -1,3 +1,4 @@
+
 import cv2
 import numpy as np
 from numpy import array
@@ -43,7 +44,7 @@ bgr = sc.parallelize(bgr.tolist())
 L = np.array(bgr.map(lambda pixel: [rgb2Lum(pixel)]).collect(), dtype=np.float32)
 
 rdd = sc.parallelize(L.tolist())
-hist = rdd.map(lambda x: (x[0], 1)).reduceByKey(lambda x,y: x+y).collect()
+hist = sc.parallelize(rdd.map(lambda x: (x[0], 1)).reduceByKey(lambda x,y: x+y).collect())
 
 clusters = KMeans.train(rdd, 256, initializationMode="random", maxIterations=5)
 
